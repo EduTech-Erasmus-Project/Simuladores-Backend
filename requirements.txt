@@ -1,0 +1,9 @@
+Django==3.2.7
+djangorestframework
+drf-yasg
+gunicorn
+polls
+markdown
+django-filter
+psycopg2
+django-environ
