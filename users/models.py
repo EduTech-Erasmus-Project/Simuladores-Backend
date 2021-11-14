@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class Perfil(models.Model):
+class Perfil2(models.Model):
     id=models.CharField(max_length=5, primary_key=True)
     nick=models.CharField(max_length=15)
     clave=models.CharField(max_length=12)
