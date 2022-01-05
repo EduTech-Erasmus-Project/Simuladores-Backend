@@ -14,11 +14,17 @@ class EvaluadorSerializer(serializers.HyperlinkedModelSerializer):
 class ExperienciaLaboralSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
         model = ExperienciaLaboral
-        fields = '__all__'
-
+        fields ='__all__'
+ 
+class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
+    class Meta: 
+        model = ExperienciaLaboral
+        fields ='__all__'
+    
+    
 class SesionSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
-        model = Sesion
+        model = Asignacion
         fields = '__all__'
 
 class EjercitarioSerializer(serializers.HyperlinkedModelSerializer): 

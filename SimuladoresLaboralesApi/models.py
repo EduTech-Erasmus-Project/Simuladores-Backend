@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+#modelo para la tabla de perfil clase padre
 class Perfil(models.Model):
     id = models.AutoField(primary_key=True, null= False)
     email = models.EmailField(blank=False, null= False)
@@ -15,17 +16,12 @@ class Perfil(models.Model):
     class Meta:
         abstract = True
 
-class ExperienciaLaboral(models.Model):
-    idExperienciaLaboral = models.AutoField(primary_key=True, null= False)
-    areaLaboral = models.CharField(max_length=50, blank= True, null= True)
-    aniosDeExperiencia = models.PositiveIntegerField(default=0, blank= True, null= True)
-    sectorEconomico = models.CharField(max_length=50, blank= True, null= True)
-    participante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True)
-    
+
+# modelo para la tabla de evaluador clase hija de perfil  
 class Evaluador(Perfil):
     nivelDeFormacion = models.CharField(max_length=50, blank= True, null= True)
 
-
+# modelo para la tabla de evaluador clase hija de perfil  
 class Participante(Perfil):
     gradoDeDiscapacidad = models.PositiveIntegerField(default=0, null= True)
     fechaNacimiento = models.DateField(verbose_name='Fecha de nacimiento')
@@ -39,14 +35,23 @@ class Participante(Perfil):
     nivelDeFormacion = models.CharField(max_length=50, blank= True, null= True)
     responsable = models.ForeignKey('Evaluador', on_delete=models.CASCADE, null=True, blank=True)
 
+#modelo para la tabla de experiencia laboral de un participante 
+class ExperienciaLaboral(models.Model):
+    idExperienciaLaboral = models.AutoField(primary_key=True, null= False)
+    areaLaboral = models.CharField(max_length=50, blank= True, null= True)
+    aniosDeExperiencia = models.PositiveIntegerField(default=0, blank= True, null= True)
+    sectorEconomico = models.CharField(max_length=50, blank= True, null= True)
+    participante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True, related_name='ExperienciaParticipante')
 
-class Sesion(models.Model):
-    idSesion = models.AutoField(primary_key=True, null= False)
-    fechaSesion = models.DateTimeField(auto_now=True, null= False)
-    sesionDelParticipante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True)
-
+#modelo para la tabla de asiganacion actividades a un participante 
+class Asignacion(models.Model):
+    idAsignacion = models.AutoField(primary_key=True, null= False)
+    fechaAsignacion = models.DateTimeField(auto_now=False, null= True)
+    participante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True,related_name='AsignacionParticipante')
+    evaluador = models.ForeignKey('Evaluador', on_delete=models.CASCADE, null=True, blank=True,related_name='AsignacionEvaluador')
+    
 class Ejercitario(models.Model):
-    idActividad = models.AutoField(primary_key=True, null= False)
+    idEjercitario = models.AutoField(primary_key=True, null= False)
     numeroDeEjercitario = models.PositiveIntegerField(default=0, blank= True, null= True)
     tipoDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
     nombreDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
@@ -55,6 +60,7 @@ class Ejercitario(models.Model):
     duracionEjercitarioPorMinutos =  models.PositiveIntegerField(default=0, blank= True, null= True)
     instruccionesParticipantes = models.CharField(max_length=300, blank= False, null= False)
     urlEjercitarios = models.URLField(max_length = 200, blank= False, null= False) 
+    asignacion = models.ForeignKey('Asignacion', on_delete=models.CASCADE, null=True, blank=True,related_name='EjercitarioAsignacion')
 
 #Convertir esta informacion para formatear 
 class Actividad(models.Model): 
@@ -62,8 +68,10 @@ class Actividad(models.Model):
     comentario = models.CharField(max_length=1000, blank= True, null= True)
     tiempoInicio = models.CharField(max_length=30, blank= False, null= False)
     tiempoFin =  models.CharField(max_length=30, blank= False, null= False)
-    sesionPorActividad = models.ForeignKey('Sesion', on_delete=models.CASCADE, null=True, blank=True)
-    ActividadPorEjercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True)
+    fechaDeActividad = models.DateTimeField(auto_now=False, null= True)
+    ActividadPorEjercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True, related_name='ActividadEjercitarioID')
+    ActividadDeParticipante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True, related_name='ActividadDelParticipante')
+    
 
 class Pregunta(models.Model):
     idActividad = models.AutoField(primary_key=True, null= False)
@@ -71,4 +79,4 @@ class Pregunta(models.Model):
     respuesta = models.CharField(max_length=100, blank= False, null= False)
     respuestaObtenida = models.CharField(max_length=100, blank= False, null= False)
     tiempoRespuesta = models.CharField(max_length=100, blank= False, null= False)
-    preguntaDeLaActividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True, blank=True)
+    preguntaDeLaActividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True, blank=True,related_name='PreguntaDeActividad')

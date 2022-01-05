@@ -3,6 +3,12 @@ from .models import *
 from .serializers import * 
 from rest_framework import viewsets
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import connection
+import json
+
 # Create your views here.
 class ParticipanteViewSet(viewsets.ModelViewSet):
   queryset = Participante.objects.all()
@@ -17,7 +23,7 @@ class ExperienciaLaboralViewSet(viewsets.ModelViewSet):
   serializer_class = ExperienciaLaboralSerializer
 
 class SesionViewSet(viewsets.ModelViewSet):
-  queryset = Sesion.objects.all()
+  queryset = Asignacion.objects.all()
   serializer_class = SesionSerializer
 
 class EjercitarioViewSet(viewsets.ModelViewSet):
@@ -31,3 +37,15 @@ class ActividadViewSet(viewsets.ModelViewSet):
 class PreguntaViewSet(viewsets.ModelViewSet):
   queryset = Pregunta.objects.all()
   serializer_class = PreguntaSerializer
+  
+#Views to post and get for Unity
+
+#class 
+
+class saveUnityEjercictario(APIView):
+  def post(self, request): 
+    valor = request.data.get('')
+    valor = request.data.get('')
+    valor = request.data.get('')
+    valor = request.data.get('')
+  
