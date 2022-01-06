@@ -12,6 +12,7 @@ from django.db import connection
 import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
+import hashlib
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -36,23 +37,28 @@ def verificarExistenciaCorreo(request):
     else:
         return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_404_NOT_FOUND) 
 
+def passwordEncriptacion(password):
+    encoded=password.encode()
+    encryptPW = hashlib.sha256(encoded)
+    return encryptPW.hexdigest()
+
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def loginAcceso(request): 
     correo = request.data.get('correo')
     password = request.data.get('password')
     tipoUser = request.data.get('tipoUsuario')
-   
+    passwd = passwordEncriptacion(password)
     if(tipoUser == 'participante'):
         try:
-            acceso = Participante.objects.get(email=correo, password = password) 
-            return Response({'login': 'true'}, status=status.HTTP_200_OK) 
-        except Evaluador.DoesNotExist: 
+            participante = Participante.objects.get(email=correo, password = passwd) 
+            return Response({'login': 'true', 'correo': participante.email}, status=status.HTTP_200_OK) 
+        except Participante.DoesNotExist: 
             return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND) 
         
     elif(tipoUser == 'evaluador'):
         try:
             acceso = Evaluador.objects.get(email=correo, password = password) 
-            return Response({'login': 'true'}, status=status.HTTP_200_OK) 
+            return Response({'login': 'true', 'correo': acceso.email}, status=status.HTTP_200_OK) 
         except Evaluador.DoesNotExist: 
             return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND) 

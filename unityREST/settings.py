@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'rest_framework',
     'SimuladoresLaboralesApi.apps.SimuladoreslaboralesapiConfig',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'unityREST.urls'
@@ -150,3 +153,25 @@ REST_FRAMEWORK = {
     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
   ],
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:4200",
+    "http://localhost:4200",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://\w+\.localhost:4200$",
+    r"^https://\w+\.127.0.0.1:4200$",
+]
+
+CORS_ORIGIN_REGEX_WHITELIST = [
+    "http://127.0.0.1:4200",
+    "http://localhost:4200",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "POST",
+    "PUT",
+]

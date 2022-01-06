@@ -48,4 +48,8 @@ class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
     class Meta: 
         model = ExperienciaLaboral
         fields ='__all__'
-    
+        
+class EvaluadorSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Evaluador
+        fields = '__all__'

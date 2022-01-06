@@ -5,8 +5,8 @@ from django.db import models
 #modelo para la tabla de perfil clase padre
 class Perfil(models.Model):
     id = models.AutoField(primary_key=True, null= False)
-    email = models.EmailField(blank=False, null= False)
-    password = models.CharField(max_length= 20, blank= False, null= False)
+    email = models.EmailField(blank=False, null= False, unique=True)
+    password = models.CharField(max_length= 800, blank= False, null= False)
     nombre = models.CharField(max_length=30, blank= False, null= False)
     apellido = models.CharField(max_length=30, blank= False, null= False)
     telefono = models.CharField(max_length=10, blank= False, null= False)
