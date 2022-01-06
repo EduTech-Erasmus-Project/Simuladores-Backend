@@ -49,39 +49,46 @@ def verificacionPassword(password):
 def registrarParticipante(request): 
     email = request.data.get('Email')
     password = request.data.get('Password')
-    nombre = request.data.get('Nombre')
-    apellido = request.data.get('Apellido')
-    telefono = request.data.get('Telefono')
-    pais = request.data.get('Pais')
-    ciudad = request.data.get('Ciudad')
-    direccion = request.data.get('Direccion')
-    gradoDeDiscapacidad = request.data.get('GradoDeDiscapacidad')
-    fechaNacimiento = request.data.get('FechaNacimiento')
-    carreraUniversitaria = request.data.get('CarreraUniversitaria')
-    genero = request.data.get('Genero')
-    numeroDeHijos = request.data.get('NumeroDeHijos')
-    estadoCivil = request.data.get('EstadoCivil')
-    estudiosPrevios = request.data.get('EstudiosPrevios')
-    codigoEstudiante = request.data.get('CodigoEstudiante')
-    nivelDeFormacion = request.data.get('NivelDeFormacion')
     responsable = request.data.get('Responsable')
-
-
-    validarCorreo = validacionCorreo(email=email)
-    validarPassword =  verificacionPassword(password=password)
-    responsableEvaluador = ""
-    
-    if validacionCorreo != False:
+    responsableEvaluador = ''
+    if validacionCorreo(email=email) != True:
         return Response({'correo': 'invalido'}, status=status.HTTP_406_NOT_ACCEPTABLE) 
-    if validarPassword != False:
+    if verificacionPassword(password=password) != True:
         return Response({'password': 'incorrecta'}, status=status.HTTP_406_NOT_ACCEPTABLE)
     try:
         responsableEvaluador = Evaluador.objects.get(id=responsable)  
     except Evaluador.DoesNotExist: 
         return Response({'responsable': 'noExist'}, status=status.HTTP_404_NOT_FOUND) 
+    
     #Creacion de nuevo participante
     encryptPW = passwordEncriptacion(password=password)
+    particpanteRegistrar = {
+        'email' : request.data.get('Email'),
+        'password' : encryptPW,
+        'nombre' : request.data.get('Nombre'),
+        'apellido' : request.data.get('Apellido'),
+        'telefono' : request.data.get('Telefono'),
+        'pais' : request.data.get('Pais'),
+        'ciudad' : request.data.get('Ciudad'),
+        'direccion' : request.data.get('Direccion'),
+        'gradoDeDiscapacidad' : request.data.get('GradoDeDiscapacidad'),
+        'fechaNacimiento' : request.data.get('FechaNacimiento'),
+        'carreraUniversitaria' : request.data.get('CarreraUniversitaria'),
+        'genero' : request.data.get('Genero'),
+        'numeroDeHijos' : request.data.get('NumeroDeHijos'),
+        'estadoCivil' : request.data.get('EstadoCivil'),
+        'estudiosPrevios' : request.data.get('EstudiosPrevios'),
+        'codigoEstudiante' : request.data.get('CodigoEstudiante'),
+        'nivelDeFormacion' : request.data.get('NivelDeFormacion'),
+        'responsable' : responsableEvaluador.id
+    }
     
+    particpanteRegistrar_serializer = ParticipanteSerializerObjects(data=particpanteRegistrar)
+    if particpanteRegistrar_serializer.is_valid():
+        particpanteRegistrar_serializer.save()
+        return Response(particpanteRegistrar_serializer.data, status=status.HTTP_201_CREATED) 
+    
+    return Response(particpanteRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -102,11 +109,8 @@ def registrarExperienciaLaboral(request):
     }
      
     experienciaLaboral_serializer = ExperienciaLaboralSerializerObjects(data=experiencia)
-    
     if experienciaLaboral_serializer.is_valid():
-        
         experienciaLaboral_serializer.save()
-        
         return Response(experienciaLaboral_serializer.data, status=status.HTTP_201_CREATED) 
     
     return Response(experienciaLaboral_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

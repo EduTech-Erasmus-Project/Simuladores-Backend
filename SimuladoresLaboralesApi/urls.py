@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^api/verficicarCorreo$', login.verificarExistenciaCorreo),
     url(r'^api/loginAcceso$', login.loginAcceso),
     url(r'^api/saveExperienciaLaboral$', registrar.registrarExperienciaLaboral),
+    url(r'^api/registrarParticipante$', registrar.registrarParticipante),
 ]

@@ -5,6 +5,7 @@ class ParticipanteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta: 
         model = Participante
         fields = '__all__'
+    
         
 class EvaluadorSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
@@ -15,12 +16,6 @@ class ExperienciaLaboralSerializer(serializers.HyperlinkedModelSerializer):
     class Meta: 
         model = ExperienciaLaboral
         fields ='__all__'
- 
-class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
-    class Meta: 
-        model = ExperienciaLaboral
-        fields ='__all__'
-    
     
 class SesionSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
@@ -41,4 +36,16 @@ class PreguntaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta: 
         model = Pregunta
         fields = '__all__'      
+
+
+#Clases para serealizar desde dentro de la apliacion ModelSerializer
+class ParticipanteSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Participante
+        fields = '__all__'
+ 
+class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
+    class Meta: 
+        model = ExperienciaLaboral
+        fields ='__all__'
     
