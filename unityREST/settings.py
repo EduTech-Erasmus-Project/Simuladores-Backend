@@ -35,7 +35,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1','localhost']
+ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1','localhost', '192.168.100.186']
 
 
 # Application definition
@@ -167,6 +167,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 CORS_ORIGIN_REGEX_WHITELIST = [
     "http://127.0.0.1:4200",
     "http://localhost:4200",
+    "http://192.168.100.186:4200",
 ]
 
 CORS_ALLOW_METHODS = [
