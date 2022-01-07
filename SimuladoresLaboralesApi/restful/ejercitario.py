@@ -9,26 +9,29 @@ from django.core.validators import validate_email
 import hashlib
 import re
 
-
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def verificarExistenciaCorreo(request): 
-    correo = request.data.get('correo')
-    tipoUserParticipante = ''
-    tipoUserEvaluador = ''
+def crearNuevaAsignacion(request): 
+    correoParticipante = request.data.get('participante')
+    correoEvaluador = request.data.get('evaluador')
     try: 
-        tipoUserParticipante = Participante.objects.get(email=correo) 
-    except Participante.DoesNotExist: 
-        print("Error en busqueda de correo en participantes")
-    try:
-        tipoUserEvaluador = Evaluador.objects.get(email=correo)  
-    except Evaluador.DoesNotExist: 
-        print("Error en busqueda de correo en evaluadores")
+        participante = Participante.objects.get(email=correoParticipante) 
+        evaluador = Evaluador.objects.get(email=correoEvaluador)  
+    except: 
+        print("Error en busqueda de correo en participantes o evaluadores")
+        return Response(status=status.HTTP_404_NOT_FOUND) 
     
-    if(tipoUserParticipante != ''):
-        return Response({'tipoUsuario': 'participante'}, status=status.HTTP_200_OK) 
-    elif (tipoUserEvaluador != ''):
-        return Response({'tipoUsuario': 'evaluador'}, status=status.HTTP_200_OK) 
-    else:
-        return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_404_NOT_FOUND) 
+    asignacionRegistrar = {
+        'fechaAsignacion' : request.data.get('fechaAsignacion'),
+        'participante' : participante.id,
+        'evaluador' : evaluador.id
+    }
+    
+    asignacionRegistrar_serializer = asignacionSerializerObjects(data=asignacionRegistrar)
+    
+    if asignacionRegistrar_serializer.is_valid():
+        asignacionRegistrar_serializer.save()
+        return Response({"status": "registrado"}, status=status.HTTP_201_CREATED) 
+    
+    return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

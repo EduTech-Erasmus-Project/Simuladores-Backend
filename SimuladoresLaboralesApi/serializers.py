@@ -35,6 +35,11 @@ class ActividadSerializer(serializers.HyperlinkedModelSerializer):
 class PreguntaSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
         model = Pregunta
+        fields = '__all__'  
+
+class RespuestaSerializer(serializers.HyperlinkedModelSerializer): 
+    class Meta: 
+        model = Respuesta
         fields = '__all__'      
 
 
@@ -52,4 +57,19 @@ class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
 class EvaluadorSerializerObjects(serializers.ModelSerializer): 
     class Meta: 
         model = Evaluador
+        fields = '__all__'
+        
+class asignacionSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Asignacion
+        fields = '__all__'
+
+class nuevaActividadUnitySerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Actividad
+        fields = '__all__'
+        
+class nuevaPreguntaUnitySerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Respuesta
         fields = '__all__'

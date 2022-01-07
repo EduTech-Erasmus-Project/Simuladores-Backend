@@ -4,6 +4,8 @@ from rest_framework import routers
 from SimuladoresLaboralesApi import views as views
 from SimuladoresLaboralesApi.restful import login as login
 from SimuladoresLaboralesApi.restful import registrar as registrar
+from SimuladoresLaboralesApi.restful import asignacion as asignacion
+from SimuladoresLaboralesApi.restful import actividad as actividad
 from django.conf.urls import url 
 
 router = routers.DefaultRouter()
@@ -19,5 +21,7 @@ urlpatterns = [
     url(r'^api/loginAcceso$', login.loginAcceso),
     url(r'^api/saveExperienciaLaboral$', registrar.registrarExperienciaLaboral),
     url(r'^api/registrarParticipante$', registrar.registrarParticipante),
-    url(r'^api/registrarEvaluadores$', registrar.registrarEvaluador)
+    url(r'^api/registrarEvaluadores$', registrar.registrarEvaluador),
+    url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),
+    url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity)
 ]
