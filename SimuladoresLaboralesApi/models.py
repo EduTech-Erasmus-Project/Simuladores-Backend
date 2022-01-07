@@ -49,10 +49,12 @@ class Asignacion(models.Model):
     fechaAsignacion = models.DateTimeField(auto_now=False, null= True)
     participante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True,related_name='AsignacionParticipante')
     evaluador = models.ForeignKey('Evaluador', on_delete=models.CASCADE, null=True, blank=True,related_name='AsignacionEvaluador')
-    
+    ejercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True,related_name='AsignacionEjercitario')
+
+
 class Ejercitario(models.Model):
     idEjercitario = models.AutoField(primary_key=True, null= False)
-    numeroDeEjercitario = models.PositiveIntegerField(default=0, blank= True, null= True)
+    numeroDeEjercitario = models.PositiveIntegerField(default=0, blank= False, null= False)
     tipoDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
     nombreDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
     instruccionPrincipalEjercitario = models.CharField(max_length=300, blank= False, null= False)
@@ -60,7 +62,13 @@ class Ejercitario(models.Model):
     duracionEjercitarioPorMinutos =  models.PositiveIntegerField(default=0, blank= True, null= True)
     instruccionesParticipantes = models.CharField(max_length=300, blank= False, null= False)
     urlEjercitarios = models.URLField(max_length = 200, blank= False, null= False) 
-    asignacion = models.ForeignKey('Asignacion', on_delete=models.CASCADE, null=True, blank=True,related_name='EjercitarioAsignacion')
+
+class Pregunta(models.Model):
+    idPregunta = models.AutoField(primary_key=True, null= False)
+    contenido = models.CharField(max_length=300, blank= False, null= False)
+    respuestaCorrecta =  models.CharField(max_length=100, blank= False, null= False)
+    numeroPregunta =  models.PositiveIntegerField(default=0, blank= False, null= False)
+    preguntaDelEjercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True,related_name='PreguntaDeEjercitario')
 
 #Convertir esta informacion para formatear 
 class Actividad(models.Model): 
@@ -73,10 +81,9 @@ class Actividad(models.Model):
     ActividadDeParticipante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True, related_name='ActividadDelParticipante')
     
 
-class Pregunta(models.Model):
-    idActividad = models.AutoField(primary_key=True, null= False)
-    contenido = models.CharField(max_length=300, blank= False, null= False)
-    respuesta = models.CharField(max_length=100, blank= False, null= False)
-    respuestaObtenida = models.CharField(max_length=100, blank= False, null= False)
+class Respuesta(models.Model):
+    idPregunta = models.AutoField(primary_key=True, null= False)
+    numeroPregunta = models.PositiveIntegerField(default=0, blank= False, null= False)
+    respuestaIngresada = models.CharField(max_length=100, blank= False, null= False)
     tiempoRespuesta = models.CharField(max_length=100, blank= False, null= False)
     preguntaDeLaActividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True, blank=True,related_name='PreguntaDeActividad')
