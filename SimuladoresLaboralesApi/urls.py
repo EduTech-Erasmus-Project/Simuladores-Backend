@@ -5,6 +5,7 @@ from SimuladoresLaboralesApi import views as views
 from SimuladoresLaboralesApi.restful import login as login
 from SimuladoresLaboralesApi.restful import registrar as registrar
 from SimuladoresLaboralesApi.restful import asignacion as asignacion
+from SimuladoresLaboralesApi.restful import ejercitario as ejercitario
 from SimuladoresLaboralesApi.restful import actividad as actividad
 from django.conf.urls import url 
 
@@ -23,5 +24,6 @@ urlpatterns = [
     url(r'^api/registrarParticipante$', registrar.registrarParticipante),
     url(r'^api/registrarEvaluadores$', registrar.registrarEvaluador),
     url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),
-    url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity)
+    url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),
+    url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante)
 ]
