@@ -35,7 +35,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1','localhost', '192.168.100.186']
+ALLOWED_HOSTS = ['*','127.0.0.1','localhost', '192.168.100.184']
 
 
 # Application definition
@@ -154,20 +154,24 @@ REST_FRAMEWORK = {
   ],
 }
 
+#CORS_ALLOW_ALL_ORIGINS: True
+
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
     "http://localhost:4200",
+    "http://192.168.100.184:4200"
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://\w+\.localhost:4200$",
     r"^https://\w+\.127.0.0.1:4200$",
+    r"^https://\w+\.192.168.100.184:4200$",
 ]
 
-CORS_ORIGIN_REGEX_WHITELIST = [
+CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:4200",
     "http://localhost:4200",
-    "http://192.168.100.186:4200",
+    "http://192.168.100.184:4200",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -175,4 +179,17 @@ CORS_ALLOW_METHODS = [
     "GET",
     "POST",
     "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "responseType",
 ]
