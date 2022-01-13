@@ -25,11 +25,7 @@ def verificarExistenciaCorreo(request):
         tipoUserParticipante = Participante.objects.get(email=correo) 
     except Participante.DoesNotExist: 
         print("Error en busqueda de correo en participantes")
-    try:
-        tipoUserEvaluador = Evaluador.objects.get(email=correo)  
-    except Evaluador.DoesNotExist: 
-        print("Error en busqueda de correo en evaluadores")
-    
+   
     if(tipoUserParticipante != ''):
         return Response({'tipoUsuario': 'participante'}, status=status.HTTP_200_OK) 
     elif (tipoUserEvaluador != ''):
@@ -62,3 +58,6 @@ def loginAcceso(request):
             return Response({'login': 'true', 'correo': acceso.email}, status=status.HTTP_200_OK) 
         except Evaluador.DoesNotExist: 
             return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND) 
+    else: 
+        return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND)
+    

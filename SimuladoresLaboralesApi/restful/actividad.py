@@ -8,14 +8,19 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 import hashlib
 import re
+from datetime import datetime
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def crearNuevaActividadUnity(request): 
+    print("**********", request.data)
     tiempoInicio = request.data.get('tiempoInicio')
     tiempoFin = request.data.get('tiempoFin')
     fechaDeActividad = request.data.get('fechaDeActividad')
+    
+    #fecha_dt = datetime.strptime(request.data.get('fechaDeActividad'), '%d/%m/%Y %HH%')
+    #print(fecha_dt)
     
     numeroEjercitario = request.data.get('numeroEjercitario')
     correo = request.data.get('correo')
@@ -37,7 +42,7 @@ def crearNuevaActividadUnity(request):
     nuevaActividadUnity_serializer = nuevaActividadUnitySerializerObjects(data=nuevaActividadRegistrar)
     
     if nuevaActividadUnity_serializer.is_valid():
-        #nuevaActividadUnity_serializer.save()
+        nuevaActividadUnity_serializer.save()
         try:
             
             actividad = Actividad.objects.order_by('-idActividad')[0]
