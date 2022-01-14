@@ -23,7 +23,6 @@ class Evaluador(Perfil):
 
 # modelo para la tabla de evaluador clase hija de perfil  
 class Participante(Perfil):
-    gradoDeDiscapacidad = models.PositiveIntegerField(default=0, null= True)
     fechaNacimiento = models.DateField(verbose_name='Fecha de nacimiento')
     carreraUniversitaria = models.CharField(max_length=100, blank= True, null= True)
     genero = models.CharField(max_length=15, blank= True, null= True)
@@ -35,6 +34,17 @@ class Participante(Perfil):
     nivelDeFormacion = models.CharField(max_length=50, blank= True, null= True)
     responsable = models.ForeignKey('Evaluador', on_delete=models.CASCADE, null=True, blank=True)
 
+class DiscapacidadParticipante(models.Model):
+    idGradoDeDiscapacidad = models.AutoField(primary_key=True, null= False)
+    gradoDeDiscapacidad = models.PositiveIntegerField(default=0, null= True)
+    participante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True, related_name='DiscapacidadParticipante')
+    discapacidad = models.ForeignKey('Discapacidad', on_delete=models.CASCADE, null=True, blank=True, related_name='TipoDiscapacidad')
+
+#modelo para la tabla de experiencia laboral de un participante 
+class Discapacidad(models.Model):
+    idDiscapacidad = models.AutoField(primary_key=True, null= False)
+    tipoDiscapacidad = models.CharField(max_length=50, blank= True, null= True, unique=True)
+    
 #modelo para la tabla de experiencia laboral de un participante 
 class ExperienciaLaboral(models.Model):
     idExperienciaLaboral = models.AutoField(primary_key=True, null= False)
@@ -60,7 +70,7 @@ class Ejercitario(models.Model):
     instruccionPrincipalEjercitario = models.CharField(max_length=300, blank= False, null= False)
     principalCompetenciasEjercitario = models.CharField(max_length=100, blank= False, null= False)
     duracionEjercitarioPorMinutos =  models.PositiveIntegerField(default=0, blank= True, null= True)
-    instruccionesParticipantes = models.CharField(max_length=300, blank= False, null= False)
+    instruccionesParticipantes = models.CharField(max_length=1000, blank= False, null= False)
     urlEjercitarios = models.URLField(max_length = 200, blank= False, null= False) 
 
 class Pregunta(models.Model):
