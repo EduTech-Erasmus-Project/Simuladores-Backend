@@ -87,14 +87,6 @@ def tiempoTotalResolucionCompletaPorEjercitario(request):
                 c = round((((b - a).total_seconds())),2)
                 listadoTiempo.append(c)
                 
-        print("listadoTiempo: ",listadoTiempo) 
         return Response({"tiempo": round((statistics.mean(listadoTiempo)/60),2)}, status=status.HTTP_201_CREATED) 
     except: 
-        print("Error en busqueda de correo en participantes o evaluadores")
         return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    #print("listadoAsignacion: ", listadoAsignacion)
-    #print(participantes)
-    
-    return Response(status=status.HTTP_404_NOT_FOUND) 
-   
