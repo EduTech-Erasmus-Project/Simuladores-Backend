@@ -37,6 +37,14 @@ class ActividadViewSet(viewsets.ModelViewSet):
 class PreguntaViewSet(viewsets.ModelViewSet):
   queryset = Pregunta.objects.all()
   serializer_class = PreguntaSerializer
+
+class DiscapaciadViewSet(viewsets.ModelViewSet):
+  queryset = Discapacidad.objects.all()
+  serializer_class = PreguntaSerializer
+
+class GradoDiscapaciadViewSet(viewsets.ModelViewSet):
+  queryset = DiscapacidadParticipante.objects.all()
+  serializer_class = PreguntaSerializer
   
 #Views to post and get for Unity
 

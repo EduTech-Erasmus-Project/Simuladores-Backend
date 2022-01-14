@@ -40,6 +40,16 @@ class PreguntaSerializer(serializers.HyperlinkedModelSerializer):
 class RespuestaSerializer(serializers.HyperlinkedModelSerializer): 
     class Meta: 
         model = Respuesta
+        fields = '__all__'  
+
+class DiscapacidadSerializer(serializers.HyperlinkedModelSerializer): 
+    class Meta: 
+        model = Discapacidad
+        fields = '__all__'      
+
+class GradoDiscapacidadSerializer(serializers.HyperlinkedModelSerializer): 
+    class Meta: 
+        model = DiscapacidadParticipante
         fields = '__all__'      
 
 
