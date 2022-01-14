@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),
     url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),
-    url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario)
+    url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
+    url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios)
 ]

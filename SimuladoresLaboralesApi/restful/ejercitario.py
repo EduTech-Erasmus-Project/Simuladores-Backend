@@ -59,3 +59,16 @@ def obtenerAsignacionDeEjercitarioDeUnParticipante(request):
         return Response(status=status.HTTP_404_NOT_FOUND) 
     
     return JsonResponse({"asignaciones": list(asignaciones)})
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def obtenerListaDeEscenarios(request):
+
+    correoEvaluador = request.data.get('evaluador')
+    try:
+        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
+        asignaciones = Asignacion.objects.all().filter(evaluador= evaluadorEjer).values()
+        return JsonResponse({"asignaciones": list(asignaciones)})      
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
