@@ -7,6 +7,8 @@ from SimuladoresLaboralesApi.restful import registrar as registrar
 from SimuladoresLaboralesApi.restful import asignacion as asignacion
 from SimuladoresLaboralesApi.restful import ejercitario as ejercitario
 from SimuladoresLaboralesApi.restful import actividad as actividad
+from SimuladoresLaboralesApi.restful import participante as participante
+from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from django.conf.urls import url 
 
 router = routers.DefaultRouter()
@@ -28,5 +30,8 @@ urlpatterns = [
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),
     url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
     url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios),
-    url(r'^api/obtenerTipoDiscpacacidadPorEvaluador$', ejercitario.obtenerTipoDiscpacacidadPorEvaluador)
+    url(r'^api/obtenerTipoDiscapacidadPorEvaluador$', ejercitario.obtenerTipoDiscapacidadPorEvaluador),
+    path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
+    path('api/getParticipante/<str:correo>', participante.getParticipante),
+    path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
 ]

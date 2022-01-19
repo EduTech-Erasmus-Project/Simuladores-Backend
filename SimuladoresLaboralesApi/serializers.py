@@ -57,7 +57,17 @@ class GradoDiscapacidadSerializer(serializers.HyperlinkedModelSerializer):
 class ParticipanteSerializerObjects(serializers.ModelSerializer): 
     class Meta: 
         model = Participante
-        fields = '__all__'
+        fields = (
+            'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
+            , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios'
+            , 'codigoEstudiante', 'nivelDeFormacion', 'responsable'
+        )
+class EvaluadorSerializerObjectsNOPassword(serializers.ModelSerializer): 
+    class Meta: 
+        model = Evaluador
+        fields = (
+            'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'nivelDeFormacion'
+        )
  
 class ExperienciaLaboralSerializerObjects(serializers.ModelSerializer):
     class Meta: 
@@ -83,3 +93,8 @@ class nuevaPreguntaUnitySerializerObjects(serializers.ModelSerializer):
     class Meta: 
         model = Respuesta
         fields = '__all__'
+        
+class EjercitarioSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = Ejercitario
+        fields = '__all__'   
