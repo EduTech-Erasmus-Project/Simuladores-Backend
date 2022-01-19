@@ -85,10 +85,17 @@ def obtenerTipoDiscpacacidadPorEvaluador():
         evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
         participantes = Participante.objects.all().filter(responsable= evaluadorEjer)
         
-        discapacidadesParticipantePorEvaluador = Discapacidad.objects.select_related('DiscapacidadParticipante', 'Participante', 'Evaluador').filter(evaluador= evaluadorEjer)
+
+        discapacidadesParticipantePorEvaluador = DiscapacidadParticipante.objects.all().filter(participantes = participantes)
         print (discapacidadesParticipantePorEvaluador)
         return Response(status=status.HTTP_404_NOT_FOUND) 
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
-    
+
+
+
+#@api_view(['POST'])
+#@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+
