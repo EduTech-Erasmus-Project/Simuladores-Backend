@@ -1,3 +1,4 @@
+import email
 from urllib import request
 from ..models import * 
 from ..serializers import * 
@@ -75,19 +76,31 @@ def obtenerListaDeEscenarios(request):
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getEscenario(request,pk):
+    try:
+        escenario = Ejercitario.objects.get(idEjercitario= pk)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    escenario_serializer = EjercitarioSerializerObjects(escenario)
+    return Response(escenario_serializer.data)
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def obtenerTipoDiscpacacidadPorEvaluador():
+def obtenerTipoDiscapacidadPorEvaluador(request):
     correoEvaluador = request.data.get('evaluador')
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
-        participantes = Participante.objects.all().filter(responsable= evaluadorEjer)
+        evaluadorEjer = Evaluador.objects.get(email= correoEvaluador) 
+        participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
+        for participanteL in participantes:
+            DiscapacidadParticipante.objects.all().filter(participante = participanteL)
+        print(d)
         
-        discapacidadesParticipantePorEvaluador = Discapacidad.objects.select_related('DiscapacidadParticipante', 'Participante', 'Evaluador').filter(evaluador= evaluadorEjer)
-        print (discapacidadesParticipantePorEvaluador)
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+        return Response(status=status.HTTP_200_OK) 
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
