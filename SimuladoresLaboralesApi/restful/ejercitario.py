@@ -79,16 +79,16 @@ def obtenerListaDeEscenarios(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def obtenerTipoDiscpacacidadPorEvaluador():
+def obtenerTipoDiscpacacidadPorEvaluador(request):
     correoEvaluador = request.data.get('evaluador')
     try:
         evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
-        participantes = Participante.objects.all().filter(responsable= evaluadorEjer)
+        #participantes = Participante.objects.all().filter(responsable= evaluadorEjer)
         
 
-        discapacidadesParticipantePorEvaluador = DiscapacidadParticipante.objects.all().filter(participantes = participantes)
-        print (discapacidadesParticipantePorEvaluador)
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+        #discapacidadesParticipantePorEvaluador = DiscapacidadParticipante.objects.all().filter(participantes = participantes)
+        print (evaluadorEjer)
+        return Response(status=status.HTTP_201_CREATED) 
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
 

@@ -28,5 +28,5 @@ urlpatterns = [
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),
     url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
     url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios),
-    url(r'^apli/obtenerTipoDiscpacacidadPorEvaluador$', ejercitario.obtenerTipoDiscpacacidadPorEvaluador)
+    url(r'^api/obtenerTipoDiscpacacidadPorEvaluador$', ejercitario.obtenerTipoDiscpacacidadPorEvaluador)
 ]
