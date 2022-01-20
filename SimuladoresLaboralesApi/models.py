@@ -13,6 +13,7 @@ class Perfil(models.Model):
     pais = models.CharField(max_length=30, blank= False, null= False)
     ciudad = models.CharField(max_length=30, blank= False, null= False)
     direccion = models.CharField(max_length=100, blank= False, null= False)
+    estado = models.CharField(max_length=100, blank= False, null= False, default='activo')
     class Meta:
         abstract = True
 
@@ -87,6 +88,10 @@ class Actividad(models.Model):
     tiempoInicio = models.CharField(max_length=30, blank= False, null= False)
     tiempoFin =  models.CharField(max_length=30, blank= False, null= False)
     fechaDeActividad = models.DateTimeField(auto_now=False, null= True)
+    totalRespuestasCorrectasIngresadasParticipante =  models.PositiveIntegerField(default=0, blank= False, null= False)
+    numeroTotalDeRespuestasContestadasPorElParticipante =  models.PositiveIntegerField(default=0, blank= False, null= False)
+    numeroTotalDePreguntasDelEjercitario =  models.PositiveIntegerField(default=0, blank= False, null= False)
+    calificacionActividad = models.PositiveIntegerField(default=0, blank= False, null= False)
     ActividadPorEjercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True, related_name='ActividadEjercitarioID')
     ActividadDeParticipante = models.ForeignKey('Participante', on_delete=models.CASCADE, null=True, blank=True, related_name='ActividadDelParticipante')
     

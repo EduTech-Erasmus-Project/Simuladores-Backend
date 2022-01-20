@@ -1,3 +1,4 @@
+from ast import Try
 from django.shortcuts import render
 
 from SimuladoresLaboralesApi.views import ParticipanteViewSet
@@ -61,3 +62,25 @@ def loginAcceso(request):
     else: 
         return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND)
     
+@api_view(['PUT'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def changePassword(request):
+    email = request.data.get('correo')
+    password = request.data.get('password')
+    newPassword = request.data.get('newPassword')
+    passwd = passwordEncriptacion(password)
+    try:
+        participante = Participante.objects.get(email= email, password = passwd)
+    except:
+        return Response({'change': 'notSame'}, status=status.HTTP_404_NOT_FOUND) 
+    
+    newpasswd = passwordEncriptacion(newPassword)
+    participante.password = newpasswd
+    try: 
+        participante.save()
+        return Response({'change': 'ok'},status=status.HTTP_200_OK) 
+    except: 
+        return Response({'change': 'error'},status=status.HTTP_400_BAD_REQUEST) 
+
+
