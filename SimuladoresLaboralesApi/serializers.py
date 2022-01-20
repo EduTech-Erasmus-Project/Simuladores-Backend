@@ -98,3 +98,8 @@ class EjercitarioSerializerObjects(serializers.ModelSerializer):
     class Meta: 
         model = Ejercitario
         fields = '__all__'   
+
+class AtributoGeneroSerializerObjects(serializers.ModelSerializer):
+    class Meta:
+        model = Participante
+        fields = ('genero')

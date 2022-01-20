@@ -31,7 +31,9 @@ urlpatterns = [
     url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
     url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios),
     url(r'^api/obtenerTipoDiscapacidadPorEvaluador$', ejercitario.obtenerTipoDiscapacidadPorEvaluador),
+    url(r'^api/obtenerTipoGeneroPorEvaluador$', ejercitario.obtenerTipoGeneroPorEvaluador),
+    url(r'^api/graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral$', ejercitario.graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral),
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<str:correo>', participante.getParticipante),
-    path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    path('api/getEvaluador/<int:pk>', evaluador.getEvaluador)
 ]
