@@ -57,11 +57,26 @@ class GradoDiscapacidadSerializer(serializers.HyperlinkedModelSerializer):
 class ParticipanteSerializerObjects(serializers.ModelSerializer): 
     class Meta: 
         model = Participante
+        fields = '__all__'
+        
+class ParticipanteSerializerObjectsSinCorreo(serializers.ModelSerializer): 
+    class Meta: 
+        model = Participante
+        fields = (
+            'id', 'password', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
+            , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios'
+            , 'codigoEstudiante', 'nivelDeFormacion', 'responsable'
+        )
+        
+class ParticipanteSerializerObjectsNOPassword(serializers.ModelSerializer): 
+    class Meta: 
+        model = Participante
         fields = (
             'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios'
             , 'codigoEstudiante', 'nivelDeFormacion', 'responsable'
         )
+        
 class EvaluadorSerializerObjectsNOPassword(serializers.ModelSerializer): 
     class Meta: 
         model = Evaluador
