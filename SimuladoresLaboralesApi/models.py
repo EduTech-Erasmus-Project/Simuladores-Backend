@@ -65,7 +65,7 @@ class Asignacion(models.Model):
 
 class Ejercitario(models.Model):
     idEjercitario = models.AutoField(primary_key=True, null= False)
-    numeroDeEjercitario = models.PositiveIntegerField(default=0, blank= False, null= False)
+    numeroDeEjercitario = models.PositiveIntegerField(default=0, unique=True, blank= False, null= False)
     tipoDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
     nombreDeEjercitario = models.CharField(max_length=30, blank= False, null= False)
     instruccionPrincipalEjercitario = models.CharField(max_length=300, blank= False, null= False)
