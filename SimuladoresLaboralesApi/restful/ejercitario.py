@@ -1,4 +1,5 @@
 import email
+from typing import Counter
 from urllib import request
 from ..models import * 
 from ..serializers import * 
@@ -93,7 +94,7 @@ def getEscenario(request,pk):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def obtenerTipoDiscapacidadPorEvaluador(request):
+def crearGraficaInicioExpertoTipoDiscapacidadVsNota(request):
 
     correoEvaluador = request.data.get('evaluador')
     try:
@@ -104,14 +105,35 @@ def obtenerTipoDiscapacidadPorEvaluador(request):
             discapacidadPorParticipante = DiscapacidadParticipante.objects.all().filter(participante = p)
 
             for discap in discapacidadPorParticipante:
+                actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = discap.participante.id)
+                
+                
                 diccionarioConParticipantes = {
                     
-                    'participante' : discap.participante.id,
-                    'participanteGenero' : discap.participante.genero,
-                    'discapacidad' : discap.discapacidad.idDiscapacidad,
-                    'tipoDiscapacidad' : discap.discapacidad.tipoDiscapacidad,
-                    #'participanteDiscapacidad': discap.discapacidadParticipante.participante
+                        'participante' : discap.participante.id,
+                        'participanteGenero' : discap.participante.genero,
+                        'discapacidad' : discap.discapacidad.idDiscapacidad,
+                        'tipoDiscapacidad' : discap.discapacidad.tipoDiscapacidad
                 }
+
+                listadoCalificaciones = []
+                contCalificaciones = 0
+                contnumeroActi = 0
+                for actiPart in actividadParticipante:
+                    contCalificaciones = contCalificaciones+actiPart.calificacionActividad 
+                    contnumeroActi = contnumeroActi + 1
+                if (contnumeroActi > 0):
+                    diccionarioConParticipantesDict = {
+                        'calificacion':  (contCalificaciones/contnumeroActi)
+                    }
+                    listadoCalificaciones.append(diccionarioConParticipantesDict)
+                else:
+                    diccionarioConParticipantesDict = {
+                        'calificacion':  0
+                    }
+                    listadoCalificaciones.append(diccionarioConParticipantesDict)
+                diccionarioConParticipantes['calificaciones'] = listadoCalificaciones
+
                 ListaParticipantediscapacidad.append(diccionarioConParticipantes)
 
             
@@ -127,25 +149,45 @@ def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
     #generoParaGrafica = request.data.get('generoParaGrafica')
     #discapacidadParaGrafica=request.data.get('discapacidadParaGrafica')
     participante = request.data.get('participante')
-
+    listaNotaPorEvaluador = []
     try: 
-        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = participante).values()
-        ListaEjercitarios= []
-        for actPar in actividadParticipante:
-            diccionarioConEjercitarios = {
+        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = participante)
+
+        for actiPart in actividadParticipante:
+                diccionarioConParticipantesNotas = {
                     
-                    'ejercitarios' : actPar.ActividadPorEjercitario_id,
-                    #'participanteGenero' : discap.participante.genero,
-                    #'discapacidad' : discap.discapacidad.idDiscapacidad,
-                    #'tipoDiscapacidad' : discap.discapacidad.tipoDiscapacidad,
-                    #'participanteDiscapacidad': discap.discapacidadParticipante.participante
+                    'calificacionActividad' : actiPart.calificacionActividad
                 }
-                ListaEjercitarios.append(diccionarioConEjercitarios)
+                listaNotaPorEvaluador.append(diccionarioConParticipantesNotas)
+
         
         
-        print (ejercitario)
+        return JsonResponse({"notaGeneral": listaNotaPorEvaluador}, status=status.HTTP_201_CREATED)
+    except: 
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def graficaInformacionGeneralTipoDiscapacidadVsTiempoGeneral(request):
+    #correoEvaluador = request.data.get('evaluador')
+    #generoParaGrafica = request.data.get('generoParaGrafica')
+    #discapacidadParaGrafica=request.data.get('discapacidadParaGrafica')
+    participante = request.data.get('participante')
+    listaNotaPorEvaluador = []
+    try: 
+        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = participante)
+
+        for actiPart in actividadParticipante:
+                diccionarioConParticipantesNotas = {
+                    
+                    'calificacionActividad' : actiPart.calificacionActividad
+                }
+                listaNotaPorEvaluador.append(diccionarioConParticipantesNotas)
+
         
-        return Response( status=status.HTTP_201_CREATED) 
+        
+        return JsonResponse({"notaGeneral": listaNotaPorEvaluador}, status=status.HTTP_201_CREATED)
     except: 
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
@@ -158,19 +200,53 @@ def obtenerTipoGeneroPorEvaluador(request):
     correoEvaluador = request.data.get('evaluador')
     try: 
         evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
+        
         participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
         
 
         ListaParticipanteGenero= []
         for participante in participantes:
-            diccionarioConParticipantesGenero = {
-                'genero' : participante.genero
-            }
-            
-            ListaParticipanteGenero.append(diccionarioConParticipantesGenero)
+            ListaParticipanteGenero.append(participante.genero)
         
-        return JsonResponse({"participanteGenero": ListaParticipanteGenero}, status=status.HTTP_201_CREATED)    
+        print()
+        listaGeneroEvaludor = list(Counter(ListaParticipanteGenero).keys())
+         
+        return JsonResponse({"participanteGenero": listaGeneroEvaludor}, status=status.HTTP_201_CREATED)    
     except: 
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def obtenerDiscapacidad(request):
+    try: 
+        discapacidades = Discapacidad.objects.all().values()
+        print(discapacidades)
+        return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_201_CREATED)    
+    except: 
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def obtenerGraficaGeneralDiscapacidadvsTiempoGeneral(request):
+
+    participante = request.data.get('participante')
+
+    listaTiempoGlobalPorEvaluador = []
+    try: 
+        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = participante)
+
+        for actiPart in actividadParticipante:
+
+            diccionarioConParticipantesTiempoGlobles = {
+                    
+                'calificacionActividad' : actiPart.calificacionActividad
+            }
+            listaTiempoGlobalPorEvaluador.append(diccionarioConParticipantesTiempoGlobles)
+    
+               
+                
+        return JsonResponse({"tiempo":listaTiempoGlobalPorEvaluador }, status=status.HTTP_201_CREATED) 
+    except: 
+        return Response(status=status.HTTP_404_NOT_FOUND) 

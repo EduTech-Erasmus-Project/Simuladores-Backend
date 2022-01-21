@@ -30,12 +30,15 @@ urlpatterns = [
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),
     url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
     url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios),
-    url(r'^api/obtenerTipoDiscapacidadPorEvaluador$', ejercitario.obtenerTipoDiscapacidadPorEvaluador),
+    url(r'^api/crearGraficaInicioExpertoTipoDiscapacidadVsNota$', ejercitario.crearGraficaInicioExpertoTipoDiscapacidadVsNota),
     url(r'^api/obtenerTipoGeneroPorEvaluador$', ejercitario.obtenerTipoGeneroPorEvaluador),
     url(r'^api/graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral$', ejercitario.graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral),
     url(r'^api/changePassword$', login.changePassword),
     url(r'^api/eliminarCuenta$', participante.eliminarCuentaParticipante),
     url(r'^api/editarCuenta$', participante.editarCuentaParticipante),
+    url(r'^api/obtenerDiscapacidad$', ejercitario.obtenerDiscapacidad),
+    url(r'^api/obtenerGraficaGeneralDiscapacidadvsTiempoGeneral$', ejercitario.obtenerGraficaGeneralDiscapacidadvsTiempoGeneral)
+    
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<str:correo>', participante.getParticipante),
     path('api/getEvaluador/<int:pk>', evaluador.getEvaluador)
