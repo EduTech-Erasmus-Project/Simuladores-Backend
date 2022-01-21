@@ -54,9 +54,9 @@ def editarCuentaParticipante(request):
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND) 
     
-    serializer = ParticipanteSerializerObjectsNOPassword(participante, data=request.data.get('participante'))
     
-    print("********",request.data.get('participante.Email'))
+    
+    print("********",request.data.get('participante')[0])
     print("--------",list(participante.__dict__))
     if serializer.is_valid():
        
