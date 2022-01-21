@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from ..models import * 
 from ..serializers import * 
 from rest_framework.response import Response
@@ -54,17 +55,53 @@ def editarCuentaParticipante(request):
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND) 
     
+    participanteModificado = request.data.get('participante')
+    participante.nombre = participanteModificado['nombre']
+    participante.apellido = participanteModificado['apellido']
+    participante.telefono = participanteModificado['telefono']
+    participante.pais = participanteModificado['pais']
+    participante.ciudad = participanteModificado['ciudad']
+    participante.direccion = participanteModificado['direccion']
+    participante.carreraUniversitaria = participanteModificado['carreraUniversitaria']
+    participante.estudiosPrevios = participanteModificado['estudiosPrevios']
+    participante.codigoEstudiante = participanteModificado['codigoEstudiante']
+    participante.estadoCivil = participanteModificado['estadoCivil']
     
-    
-    print("********",request.data.get('participante')[0])
-    print("--------",list(participante.__dict__))
-    if serializer.is_valid():
-       
+    try:
+        participante.save()
         return Response({'edit': 'ok'},status=status.HTTP_200_OK) 
+    except:
+        return Response({'edit': 'error'},status=status.HTTP_400_BAD_REQUEST) 
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def informacionActividadesParticipante(request,correo):
+    try:
+        participante = Participante.objects.get(email= correo)
+        actividades = Actividad.objects.all().filter(ActividadDeParticipante = participante).order_by('-fechaDeActividad')
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
     
-    return Response({'edit': 'error'},status=status.HTTP_400_BAD_REQUEST)
-    """try: 
-        #participante.save()
-        return Response({'edit': 'ok'},status=status.HTTP_200_OK) 
-    except: 
-        return Response({'edit': 'error'},status=status.HTTP_400_BAD_REQUEST) """
+    listadoInformacionActividades = []
+    try:
+        for actividad in actividades: 
+            ejercitario = Ejercitario.objects.get(idEjercitario = actividad.ActividadPorEjercitario.idEjercitario)
+        
+            informacionActividad = {
+                'idActividad' : actividad.idActividad,
+                'tiempoTotalResolucionEjercitario': actividad.tiempoTotalResolucionEjercitario,
+                'fechaDeActividad': actividad.fechaDeActividad,
+                'totalRespuestasCorrectasIngresadasParticipante': actividad.totalRespuestasCorrectasIngresadasParticipante,
+                'numeroTotalDePreguntasDelEjercitario':actividad.numeroTotalDePreguntasDelEjercitario,
+                'calificacionActividad': actividad.calificacionActividad,
+                'ejercitario': ejercitario.nombreDeEjercitario
+            }
+            listadoInformacionActividades.append(informacionActividad)
+        
+        return JsonResponse({"actividades":listadoInformacionActividades}, status=status.HTTP_200_OK)
+    except:
+        return Response({'actividades': 'error'},status=status.HTTP_400_BAD_REQUEST)
+
+

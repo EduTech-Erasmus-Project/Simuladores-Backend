@@ -37,4 +37,5 @@ urlpatterns = [
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<str:correo>', participante.getParticipante),
     path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
 ]
