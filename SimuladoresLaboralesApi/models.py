@@ -87,6 +87,7 @@ class Actividad(models.Model):
     comentario = models.CharField(max_length=1000, blank= True, null= True)
     tiempoInicio = models.CharField(max_length=30, blank= False, null= False)
     tiempoFin =  models.CharField(max_length=30, blank= False, null= False)
+    tiempoTotalResolucionEjercitario = models.PositiveIntegerField(default=0, blank= False, null= False)
     fechaDeActividad = models.DateTimeField(auto_now=False, null= True)
     totalRespuestasCorrectasIngresadasParticipante =  models.PositiveIntegerField(default=0, blank= False, null= False)
     numeroTotalDeRespuestasContestadasPorElParticipante =  models.PositiveIntegerField(default=0, blank= False, null= False)
