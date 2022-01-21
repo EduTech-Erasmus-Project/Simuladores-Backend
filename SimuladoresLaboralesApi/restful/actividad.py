@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 import hashlib
 import re
-from datetime import datetime
+import datetime
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -94,10 +94,18 @@ def crearNuevaActividadUnity(request):
         print("Error en busqueda de correo en participantes o evaluadores")
         return Response(status=status.HTTP_404_NOT_FOUND) 
     
+    tiempoA = tiempoInicio.split(':') 
+    tiempoB = tiempoFin.split(':') 
+    a = datetime.timedelta(hours=int(tiempoA[0]),minutes=int(tiempoA[1]), seconds=int(tiempoA[2]))
+    b = datetime.timedelta(hours=int(tiempoB[0]),minutes=int(tiempoB[1]), seconds=int(tiempoB[2]))
+    tiempoTotalResolucionEjercitario = round((((b - a).total_seconds())),2)
+    
+    
     nuevaActividadRegistrar = {
         'tiempoInicio' : tiempoInicio,
         'tiempoFin' : tiempoFin,
         'fechaDeActividad' : fechaDeActividad,
+        'tiempoTotalResolucionEjercitario':tiempoTotalResolucionEjercitario,
         'ActividadPorEjercitario' : ejercitario.idEjercitario,
         'ActividadDeParticipante' : participante.id
     }
@@ -133,8 +141,7 @@ def crearNuevaActividadUnity(request):
                     nuevaPreguntaUnity_serializer.save()
                 else:
                     return Response(nuevaPreguntaUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            print("cont: ",cont)
-            print("totalPreguntas: ",totalPreguntas)        
+            #Almacenamiento de calificaciones  
             actividad.totalRespuestasCorrectasIngresadasParticipante = cont
             actividad.numeroTotalDeRespuestasContestadasPorElParticipante = totalPreguntas
             actividad.numeroTotalDePreguntasDelEjercitario = len(preguntasEjercitario)
