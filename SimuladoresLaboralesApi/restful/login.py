@@ -27,12 +27,18 @@ def verificarExistenciaCorreo(request):
     except Participante.DoesNotExist: 
         print("Error en busqueda de correo en participantes")
    
-    if(tipoUserParticipante != ''):
+    if(tipoUserParticipante != '' and (tipoUserParticipante.estado=="activo")):
         return Response({'tipoUsuario': 'participante'}, status=status.HTTP_200_OK) 
-    elif (tipoUserEvaluador != ''):
+    
+    try: 
+        tipoUserEvaluador = Evaluador.objects.get(email=correo) 
+    except Participante.DoesNotExist: 
+        print("Error en busqueda de correo en evaluador")
+        
+    if (tipoUserEvaluador != '' and (tipoUserEvaluador.estado=="activo")):
         return Response({'tipoUsuario': 'evaluador'}, status=status.HTTP_200_OK) 
-    else:
-        return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_404_NOT_FOUND) 
+    
+    return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_404_NOT_FOUND) 
 
 def passwordEncriptacion(password):
     encoded=password.encode()
@@ -53,14 +59,14 @@ def loginAcceso(request):
         except Participante.DoesNotExist: 
             return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND) 
         
-    elif(tipoUser == 'evaluador'):
+    if(tipoUser == 'evaluador'):
         try:
-            acceso = Evaluador.objects.get(email=correo, password = password) 
+            acceso = Evaluador.objects.get(email=correo, password = passwd) 
             return Response({'login': 'true', 'correo': acceso.email}, status=status.HTTP_200_OK) 
         except Evaluador.DoesNotExist: 
             return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND) 
-    else: 
-        return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({'login': 'false'}, status=status.HTTP_404_NOT_FOUND)
     
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
@@ -79,6 +85,28 @@ def changePassword(request):
     participante.password = newpasswd
     try: 
         participante.save()
+        return Response({'change': 'ok'},status=status.HTTP_200_OK) 
+    except: 
+        return Response({'change': 'error'},status=status.HTTP_400_BAD_REQUEST) 
+
+
+@api_view(['PUT'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def changePasswordResponsable(request):
+    email = request.data.get('correo')
+    password = request.data.get('password')
+    newPassword = request.data.get('newPassword')
+    passwd = passwordEncriptacion(password)
+    try:
+        evaluador = Evaluador.objects.get(email= email, password = passwd)
+    except:
+        return Response({'change': 'notSame'}, status=status.HTTP_404_NOT_FOUND) 
+    
+    newpasswd = passwordEncriptacion(newPassword)
+    evaluador.password = newpasswd
+    try: 
+        evaluador.save()
         return Response({'change': 'ok'},status=status.HTTP_200_OK) 
     except: 
         return Response({'change': 'error'},status=status.HTTP_400_BAD_REQUEST) 

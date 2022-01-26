@@ -43,6 +43,10 @@ def eliminarCuentaParticipante(request):
         return Response({'delete': 'ok'},status=status.HTTP_200_OK) 
     except: 
         return Response({'delete': 'error'},status=status.HTTP_400_BAD_REQUEST) 
+    
+
+
+
 
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))

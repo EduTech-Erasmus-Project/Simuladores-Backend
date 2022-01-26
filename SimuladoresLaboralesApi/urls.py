@@ -34,8 +34,12 @@ urlpatterns = [
     url(r'^api/changePassword$', login.changePassword),
     url(r'^api/eliminarCuenta$', participante.eliminarCuentaParticipante),
     url(r'^api/editarCuenta$', participante.editarCuentaParticipante),
+    url(r'^api/changePasswordResponsable$', login.changePasswordResponsable),
+    url(r'^api/eliminarCuentaResponsable$', evaluador.eliminarCuentaResponsable),
+    url(r'^api/editarCuentaResponsable$', evaluador.editarCuentaResponsable),
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<str:correo>', participante.getParticipante),
     path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
 ]
