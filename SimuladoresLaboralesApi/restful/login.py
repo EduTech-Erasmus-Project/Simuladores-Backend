@@ -27,7 +27,7 @@ def verificarExistenciaCorreo(request):
     except Participante.DoesNotExist: 
         print("Error en busqueda de correo en participantes")
    
-    if(tipoUserParticipante != '' and (tipoUserParticipante.estado=="activo")):
+    if(tipoUserParticipante != '' and (tipoUserParticipante.estado=="activo") and (tipoUserParticipante.aceptacionPendianteResponsable=="aceptado")):
         return Response({'tipoUsuario': 'participante'}, status=status.HTTP_200_OK) 
     
     try: 

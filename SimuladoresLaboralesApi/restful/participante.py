@@ -109,3 +109,15 @@ def informacionActividadesParticipante(request,correo):
         return Response({'actividades': 'error'},status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getParticipantesIntentosEjercitario(request,correo,ejercitario):
+    try:
+        participante = Participante.objects.get(email= correo)
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario = ejercitario)
+        actividades = Actividad.objects.all().filter(ActividadDeParticipante = participante).filter(ActividadPorEjercitario = ejercitario).order_by('-fechaDeActividad').values()
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    return JsonResponse({"actividades":list(actividades)}, status=status.HTTP_200_OK)

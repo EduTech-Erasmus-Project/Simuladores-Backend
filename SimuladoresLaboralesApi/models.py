@@ -33,6 +33,7 @@ class Participante(Perfil):
     estudiosPrevios = models.CharField(max_length=100, blank= True, null= True)
     codigoEstudiante = models.CharField(max_length=30, blank= True, null= True)
     nivelDeFormacion = models.CharField(max_length=50, blank= True, null= True)
+    aceptacionPendianteResponsable = models.CharField(max_length=100, blank= False, null= False, default='faltaAceptacion')
     responsable = models.ForeignKey('Evaluador', on_delete=models.CASCADE, null=True, blank=True)
 
 class DiscapacidadParticipante(models.Model):
@@ -80,6 +81,12 @@ class Pregunta(models.Model):
     respuestaCorrecta =  models.CharField(max_length=100, blank= False, null= False)
     numeroPregunta =  models.PositiveIntegerField(default=0, blank= False, null= False)
     preguntaDelEjercitario = models.ForeignKey('Ejercitario', on_delete=models.CASCADE, null=True, blank=True,related_name='PreguntaDeEjercitario')
+
+class Comentario(models.Model):
+    idComentario = models.AutoField(primary_key=True, null= False)
+    comentario = models.CharField(max_length=1000, blank= False, null= False)
+    fechaComentario = models.DateTimeField(auto_now=False, null= True)
+    comentarioActividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True, blank=True,related_name='ComentarioDeActividad')
 
 #Convertir esta informacion para formatear 
 class Actividad(models.Model): 

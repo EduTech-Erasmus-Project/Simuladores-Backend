@@ -46,6 +46,10 @@ class GradoDiscapaciadViewSet(viewsets.ModelViewSet):
   queryset = DiscapacidadParticipante.objects.all()
   serializer_class = PreguntaSerializer
   
+class ComentarioViewSet(viewsets.ModelViewSet):
+  queryset = Comentario.objects.all()
+  serializer_class = ComentarioSerializerObjectsModel
+  
 #Views to post and get for Unity
 
 #class 
