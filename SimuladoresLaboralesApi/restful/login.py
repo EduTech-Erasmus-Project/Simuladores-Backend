@@ -32,13 +32,13 @@ def verificarExistenciaCorreo(request):
     
     try: 
         tipoUserEvaluador = Evaluador.objects.get(email=correo) 
-    except Participante.DoesNotExist: 
+    except Evaluador.DoesNotExist: 
         print("Error en busqueda de correo en evaluador")
         
     if (tipoUserEvaluador != '' and (tipoUserEvaluador.estado=="activo")):
         return Response({'tipoUsuario': 'evaluador'}, status=status.HTTP_200_OK) 
     
-    return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_404_NOT_FOUND) 
+    return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_200_OK) 
 
 def passwordEncriptacion(password):
     encoded=password.encode()

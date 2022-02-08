@@ -153,3 +153,25 @@ def eliminarParticipanteEvaluador(request,correo):
         return JsonResponse({"participantesAceptacion":'aceptado'}, status=status.HTTP_200_OK)
     except:
         return Response({'participantesAceptacion': 'error'},status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getEvaluadores(request):
+    try:
+        evaluadores = Evaluador.objects.all()
+        evaluadorList = []
+        for evaluador in evaluadores:
+            evaluadorJSON = {
+                'nombre' : evaluador.nombre,
+                'apellido' : evaluador.apellido,
+                'correo' : evaluador.email
+            }
+            evaluadorList.append(evaluadorJSON)
+        
+        return JsonResponse({"evaluadores":evaluadorList}, status=status.HTTP_200_OK)
+            
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+
+    

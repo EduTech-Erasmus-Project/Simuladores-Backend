@@ -64,6 +64,7 @@ urlpatterns = [
     path('api/getDiscapacidadesDelParticipante/<str:correo>', discapacidadParticipante.getDiscapacidadesDelParticipante),
     path('api/getParticipantesIntentosEjercitario/<str:correo>/<int:ejercitario>', participante.getParticipantesIntentosEjercitario),
     path('api/getComentariosActividadRealizada/<int:actividad>', comentario.getComentariosActividadRealizada),
+    path('api/getEvaluadores/', evaluador.getEvaluadores),
    
     
 ]
