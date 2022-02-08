@@ -38,16 +38,16 @@ def verificacionPassword(password):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarParticipante(request): 
-    email = request.data.get('Email')
-    passwd = request.data.get('Password')
-    responsable = request.data.get('Responsable')
+    email = request.data.get('email')
+    passwd = request.data.get('password')
+    responsable = request.data.get('responsable')
     responsableEvaluador = ''
     if validacionCorreo(email=email) != True:
         return Response({'correo': 'invalido'}, status=status.HTTP_406_NOT_ACCEPTABLE) 
     if verificacionPassword(password=passwd) != True:
         return Response({'password': 'incorrecta'}, status=status.HTTP_406_NOT_ACCEPTABLE)
     try:
-        responsableEvaluador = Evaluador.objects.get(id=responsable)  
+        responsableEvaluador = Evaluador.objects.get(email=responsable)  
     except Evaluador.DoesNotExist: 
         return Response({'responsable': 'noExist'}, status=status.HTTP_404_NOT_FOUND) 
     
@@ -55,24 +55,24 @@ def registrarParticipante(request):
     #Creacion de nuevo participante
     encryptPW = passwordEncriptacion(password=passwd)  
     particpanteRegistrar = {
-        'email' : request.data.get('Email'),
+        'email' : request.data.get('email'),
         'password' : encryptPW,
-        'nombre' : request.data.get('Nombre'),
-        'apellido' : request.data.get('Apellido'),
-        'telefono' : request.data.get('Telefono'),
-        'pais' : request.data.get('Pais'),
-        'ciudad' : request.data.get('Ciudad'),
-        'direccion' : request.data.get('Direccion'),
-        'gradoDeDiscapacidad' : request.data.get('GradoDeDiscapacidad'),
-        'fechaNacimiento' : request.data.get('FechaNacimiento'),
-        'carreraUniversitaria' : request.data.get('CarreraUniversitaria'),
-        'genero' : request.data.get('Genero'),
-        'numeroDeHijos' : request.data.get('NumeroDeHijos'),
-        'estadoCivil' : request.data.get('EstadoCivil'),
-        'etnia' : request.data.get('Etnia'),
-        'estudiosPrevios' : request.data.get('EstudiosPrevios'),
-        'codigoEstudiante' : request.data.get('CodigoEstudiante'),
-        'nivelDeFormacion' : request.data.get('NivelDeFormacion'),
+        'nombre' : request.data.get('nombre'),
+        'apellido' : request.data.get('apellido'),
+        'telefono' : request.data.get('telefono'),
+        'pais' : request.data.get('pais'),
+        'ciudad' : request.data.get('ciudad'),
+        'direccion' : request.data.get('direccion'),
+        'estado' : request.data.get('estado'),
+        'fechaNacimiento' : request.data.get('fechaNacimiento'),
+        'carreraUniversitaria' : request.data.get('carreraUniversitaria'),
+        'genero' : request.data.get('genero'),
+        'numeroDeHijos' : request.data.get('numeroDeHijos'),
+        'estadoCivil' : request.data.get('estadoCivil'),
+        'etnia' : request.data.get('etnia'),
+        'estudiosPrevios' : request.data.get('estudiosPrevios'),
+        'codigoEstudiante' : request.data.get('codigoEstudiante'),
+        'nivelDeFormacion' : request.data.get('nivelDeFormacion'),
         'responsable' : responsableEvaluador.id
     }
     
@@ -80,7 +80,6 @@ def registrarParticipante(request):
     if particpanteRegistrar_serializer.is_valid():
         particpanteRegistrar_serializer.save()
         return Response({"status": "registrado"}, status=status.HTTP_201_CREATED) 
-    
     return Response(particpanteRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
