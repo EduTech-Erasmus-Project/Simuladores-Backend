@@ -16,3 +16,27 @@ def getExperienciaLaboral(request,correo):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
     return JsonResponse({"experienciaLaboral":list(experienciasPartipante)}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def registrarExperienciaLaboral(request): 
+    
+    correo = request.data.get('correo')
+    try:
+        participanteSeleccionado = Participante.objects.get(email=correo)  
+    except Participante.DoesNotExist: 
+        return Response({'participante': 'noExist'}, status=status.HTTP_404_NOT_FOUND) 
+    
+    experienciaLaboralRegistrar = {
+        'areaLaboral' :  request.data.get('areaLaboral'),
+        'aniosDeExperiencia' : request.data.get('experienciaAnios'),
+        'sectorEconomico' : request.data.get('sectorEconomico'),
+        'participante' : participanteSeleccionado.id
+    }
+    
+    experienciaLaboralRegistrar_serializer = ExperienciaLaboralSerializerObjects(data=experienciaLaboralRegistrar)
+    if experienciaLaboralRegistrar_serializer.is_valid():
+        experienciaLaboralRegistrar_serializer.save()
+        return Response({"status": "experiencia registrada"}, status=status.HTTP_201_CREATED) 
+    
+    return Response(experienciaLaboralRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

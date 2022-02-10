@@ -28,6 +28,8 @@ urlpatterns = [
     url(r'^api/saveExperienciaLaboral$', registrar.registrarExperienciaLaboral),
     url(r'^api/registrarParticipante$', registrar.registrarParticipante),
     url(r'^api/registrarEvaluadores$', registrar.registrarEvaluador),
+    url(r'^api/registrarDiscapacidad$', discapacidadParticipante.registrarDiscapacidad),
+    url(r'^api/registrarExperienciaLaboral$', experienciaLaboral.registrarExperienciaLaboral),
     url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),
     url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),
     url(r'^api/agregarNuevoComentarioActividadParticipante$', comentario.agregarNuevoComentarioActividadParticipante),

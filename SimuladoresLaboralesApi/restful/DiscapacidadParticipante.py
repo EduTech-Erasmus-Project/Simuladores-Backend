@@ -28,3 +28,28 @@ def getDiscapacidadesDelParticipante(request,correo):
         discapacidadesList.append(informacionDiscapacidad)
     
     return JsonResponse({"discapacidadesParticipante":discapacidadesList}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def registrarDiscapacidad(request): 
+    discapacidad = request.data.get('discapacidad')
+    porcentaje = request.data.get('porcentaje')
+    correo = request.data.get('correo')
+    try:
+        discapacidadSeleccionada = Discapacidad.objects.get(tipoDiscapacidad=discapacidad) 
+        participanteSeleccionado = Participante.objects.get(email=correo)  
+    except Discapacidad.DoesNotExist: 
+        return Response({'discapacidad': 'noExist'}, status=status.HTTP_404_NOT_FOUND) 
+    
+    discapacidadRegistrar = {
+        'gradoDeDiscapacidad' : porcentaje,
+        'participante' : participanteSeleccionado.id,
+        'discapacidad' : discapacidadSeleccionada.idDiscapacidad,
+    }
+    
+    discapacidadRegistrar_serializer = DiscapacidadParticipanteSerializerObjects(data=discapacidadRegistrar)
+    if discapacidadRegistrar_serializer.is_valid():
+        discapacidadRegistrar_serializer.save()
+        return Response({"status": "discapacidad registrada"}, status=status.HTTP_201_CREATED) 
+    
+    return Response(discapacidadRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

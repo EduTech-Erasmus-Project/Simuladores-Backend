@@ -130,3 +130,9 @@ class ComentarioSerializerObjectsModel(serializers.ModelSerializer):
     class Meta: 
         model = Comentario
         fields ='__all__'
+
+#Clases para serealizar desde dentro de la apliacion ModelSerializer
+class DiscapacidadParticipanteSerializerObjects(serializers.ModelSerializer): 
+    class Meta: 
+        model = DiscapacidadParticipante
+        fields = '__all__'
