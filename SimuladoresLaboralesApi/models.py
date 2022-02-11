@@ -1,6 +1,7 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
 # Create your models here.
+##modelo para autorizacion
 
 #modelo para la tabla de perfil clase padre
 class Perfil(models.Model):

@@ -50,6 +50,7 @@ class ComentarioViewSet(viewsets.ModelViewSet):
   queryset = Comentario.objects.all()
   serializer_class = ComentarioSerializerObjectsModel
   
+
 #Views to post and get for Unity
 
 #class 

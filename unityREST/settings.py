@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import environ
 import os
+import datetime
 
 env = environ.Env(
     # set casting, default value
@@ -52,6 +53,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'SimuladoresLaboralesApi.apps.SimuladoreslaboralesapiConfig',
     "corsheaders",
+    'allauth',
+    'allauth.account',
+    'rest_auth',
+    'rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -151,10 +156,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [                     
     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-  ],
+  ],'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'NON_FIELD_ERRORS_KEY': 'global',
 }
 
-#CORS_ALLOW_ALL_ORIGINS: True
+CORS_ORIGIN_ALLOW_ALL: True
+CORS_ALLOW_CREDENTIALS: True
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
@@ -197,3 +208,9 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
     "responseType",
 ]
+
+JWT_AUTH = {
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+}
+

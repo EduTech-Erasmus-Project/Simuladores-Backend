@@ -437,3 +437,26 @@ def getNotasEstudianteEjercitarioResponsable(request,correoEvaluador, ejercitari
         return JsonResponse({"notas": listadoCalificaciones}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    
+
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def obtenerInformacionLandingPage(request):
+    
+    try:
+        evaluadoresCount = Evaluador.objects.all().count()
+        participanteCount = Participante.objects.all().filter(estado = 'activo').count()
+        simuladoresCount = Ejercitario.objects.all().count()
+        
+        diccionarioLandingPageDict = {
+            'evaluadoresCount' : evaluadoresCount,
+            'participanteCount' : participanteCount,
+            'simuladoresCount':  simuladoresCount
+        }   
+        return Response(diccionarioLandingPageDict, status=status.HTTP_201_CREATED)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 

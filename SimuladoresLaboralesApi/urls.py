@@ -25,12 +25,15 @@ urlpatterns = [
     #path('api/verficicarCorreo/', login.verificarExistenciaCorreo),
     url(r'^api/verficicarCorreo$', login.verificarExistenciaCorreo),
     url(r'^api/loginAcceso$', login.loginAcceso),
+    url(r'^api/logout$', login.logout),
+    url(r'^api/refreshToken$', login.refreshToken),
     url(r'^api/saveExperienciaLaboral$', registrar.registrarExperienciaLaboral),
     url(r'^api/registrarParticipante$', registrar.registrarParticipante),
     url(r'^api/registrarEvaluadores$', registrar.registrarEvaluador),
     url(r'^api/registrarDiscapacidad$', discapacidadParticipante.registrarDiscapacidad),
     url(r'^api/registrarExperienciaLaboral$', experienciaLaboral.registrarExperienciaLaboral),
     url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),
+    url(r'^api/agregarAsignacioneParticipante$', asignacion.agregarAsignacioneParticipante),
     url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),
     url(r'^api/agregarNuevoComentarioActividadParticipante$', comentario.agregarNuevoComentarioActividadParticipante),
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$', ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),
@@ -51,6 +54,7 @@ urlpatterns = [
     url(r'^api/graficainfoParticipanteIntentosVsNotasTiempo$', ejercitario.graficainfoParticipanteIntentosVsNotasTiempo),
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<str:correo>', participante.getParticipante),
+    path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>', participante.getParticipanteDeUnResponsable),
     path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
     path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
@@ -67,6 +71,10 @@ urlpatterns = [
     path('api/getParticipantesIntentosEjercitario/<str:correo>/<int:ejercitario>', participante.getParticipantesIntentosEjercitario),
     path('api/getComentariosActividadRealizada/<int:actividad>', comentario.getComentariosActividadRealizada),
     path('api/getEvaluadores/', evaluador.getEvaluadores),
-   
+    path('api/getUsuarioCookiesJWT/', login.recuperarUsuarioCookiesJWT),
+    path('api/obtenerInformacionAsignacionesParticipante/<str:correo>/<str:correoResponsable>', participante.obtenerInformacionAsignacionesParticipante),
+    path('api/eliminarAsignacion/<int:idAsignacion>', asignacion.eliminarAsignacion),
+    path('api/obtenerInformacionLandingPage/', ejercitario.obtenerInformacionLandingPage),
+    
     
 ]

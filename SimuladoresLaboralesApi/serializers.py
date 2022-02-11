@@ -136,3 +136,5 @@ class DiscapacidadParticipanteSerializerObjects(serializers.ModelSerializer):
     class Meta: 
         model = DiscapacidadParticipante
         fields = '__all__'
+
+

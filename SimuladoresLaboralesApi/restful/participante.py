@@ -1,3 +1,4 @@
+import email
 from django.http import JsonResponse
 from ..models import * 
 from ..serializers import * 
@@ -19,6 +20,26 @@ def getParticipante(request,correo):
     
     participante_serializer = ParticipanteSerializerObjectsNOPassword(participante)
     return Response(participante_serializer.data)
+
+def passwordEncriptacion(password):
+    encoded=password.encode()
+    encryptPW = hashlib.sha256(encoded)
+    return encryptPW.hexdigest()
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getParticipanteDeUnResponsable(request,correo,correoResponsable):
+    try:
+        evaluador = Evaluador.objects.get(email = correoResponsable)
+        participante = Participante.objects.all().filter(email= correo).filter(responsable = evaluador)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    participante_serializer = ParticipanteSerializerObjectsNOPassword(participante[0])
+    if participante_serializer.is_valid:
+        return Response(participante_serializer.data)
+    return Response(participante_serializer.errors) 
 
 def passwordEncriptacion(password):
     encoded=password.encode()
@@ -121,3 +142,34 @@ def getParticipantesIntentosEjercitario(request,correo,ejercitario):
         return Response(status=status.HTTP_404_NOT_FOUND) 
     
     return JsonResponse({"actividades":list(actividades)}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def obtenerInformacionAsignacionesParticipante(request,correo,correoResponsable):
+    try:
+        evaluadorBuscado = Evaluador.objects.get(email=correoResponsable)
+        participanteBuscado = Participante.objects.get(email= correo)
+        asignaciones = Asignacion.objects.all().filter(participante= participanteBuscado).filter(evaluador= evaluadorBuscado).order_by('-fechaAsignacion')
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    listadoInformacionAsignaciones = []
+    
+    try:
+        for asignacion in asignaciones: 
+            ejercitario = Ejercitario.objects.get(idEjercitario= asignacion.ejercitario.idEjercitario)
+            informacionAsignacion = {
+                'idAsignacion' : asignacion.idAsignacion,
+                'fechaAsignacion': asignacion.fechaAsignacion,
+                'participante': participanteBuscado.email,
+                'evaluador': evaluadorBuscado.email,
+                'numeroDeEjercitario': ejercitario.numeroDeEjercitario,
+                'nombreDeEjercitario': ejercitario.nombreDeEjercitario
+            }
+            listadoInformacionAsignaciones.append(informacionAsignacion)
+        
+        return JsonResponse({"asignaciones":listadoInformacionAsignaciones}, status=status.HTTP_200_OK)
+    except:
+        return Response({'asignaciones': 'error'},status=status.HTTP_400_BAD_REQUEST)

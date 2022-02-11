@@ -43,6 +43,46 @@ def crearNuevaAsignacion(request):
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def agregarAsignacioneParticipante(request): 
+    correoParticipante = request.data.get('emailParticipanteSeleccion')
+    correoEvaluador = request.data.get('correoEvaluadorActividades')
+    numeroejercitario = request.data.get('selectedEjercitario')
+    fecha = request.data.get('fechaActividad')
+
+    try: 
+        participante = Participante.objects.get(email=correoParticipante) 
+        evaluador = Evaluador.objects.get(email=correoEvaluador)  
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=numeroejercitario)  
+    except: 
+        print("Error en busqueda de correo en participantes o evaluadores")
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    asignacionRegistrar = {
+        'fechaAsignacion' : fecha,
+        'participante' : participante.id,
+        'evaluador' : evaluador.id,
+        'ejercitario' : ejercitario.idEjercitario
+    }
+    
+    asignacionRegistrar_serializer = asignacionSerializerObjects(data=asignacionRegistrar)
+    
+    if asignacionRegistrar_serializer.is_valid():
+        asignacionRegistrar_serializer.save()
+        informacionAsignacion = {
+            'idAsignacion':asignacionRegistrar_serializer.data['idAsignacion'],
+            'fechaAsignacion':  fecha,
+            'participante': participante.email,
+            'evaluador': evaluador.email,
+            'numeroDeEjercitario': ejercitario.numeroDeEjercitario,
+            'nombreDeEjercitario': ejercitario.nombreDeEjercitario
+        }
+        return Response(informacionAsignacion, status=status.HTTP_201_CREATED) 
+    
+    return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -90,3 +130,19 @@ def tiempoTotalResolucionCompletaPorEjercitario(request):
         return Response({"tiempo": round((statistics.mean(listadoTiempo)/60),2)}, status=status.HTTP_201_CREATED) 
     except: 
         return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def eliminarAsignacion(request,idAsignacion):
+    try:
+        asignacion = Asignacion.objects.get(idAsignacion= idAsignacion)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    
+    try:    
+        asignacion.delete() 
+        return JsonResponse({"asignacion":'delete'}, status=status.HTTP_204_NO_CONTENT)
+    except:
+        return Response({'asignacion': 'error'},status=status.HTTP_400_BAD_REQUEST)
