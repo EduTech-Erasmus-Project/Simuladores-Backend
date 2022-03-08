@@ -76,5 +76,5 @@ urlpatterns = [
     path('api/eliminarAsignacion/<int:idAsignacion>', asignacion.eliminarAsignacion),
     path('api/obtenerInformacionLandingPage/', ejercitario.obtenerInformacionLandingPage),
     
-    
+    path('api/getEjercitarios/', ejercitario.getEscenarios),
 ]

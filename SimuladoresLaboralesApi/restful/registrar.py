@@ -111,26 +111,26 @@ def registrarExperienciaLaboral(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarEvaluador(request): 
-    email = request.data.get('Email')
-    passwd = request.data.get('Password')
+    email = request.data.get('email')
+    passwd = request.data.get('password')
 
     if validacionCorreo(email=email) != True:
         return Response({'correo': 'invalido'}, status=status.HTTP_406_NOT_ACCEPTABLE) 
     if verificacionPassword(password=passwd) != True:
         return Response({'password': 'incorrecta'}, status=status.HTTP_406_NOT_ACCEPTABLE)
     
-    #Creacion de nuevo participante
+    #Creacion de nuevo experto
     encryptPW = passwordEncriptacion(password=passwd)  
     evaluadorRegistrar = {
-        'email' : request.data.get('Email'),
+        'email' : request.data.get('email'),
         'password' : encryptPW,
-        'nombre' : request.data.get('Nombre'),
-        'apellido' : request.data.get('Apellido'),
-        'telefono' : request.data.get('Telefono'),
-        'pais' : request.data.get('Pais'),
-        'ciudad' : request.data.get('Ciudad'),
-        'direccion' : request.data.get('Direccion'),
-        'nivelDeFormacion' : request.data.get('NivelDeFormacion'),
+        'nombre' : request.data.get('nombre'),
+        'apellido' : request.data.get('apellido'),
+        'telefono' : request.data.get('telefono'),
+        'pais' : request.data.get('pais'),
+        'ciudad' : request.data.get('ciudad'),
+        'direccion' : request.data.get('direccion'),
+        'nivelDeFormacion' : request.data.get('nivelDeFormacion'),
     }
     
     evaluadorRegistrar_serializer = EvaluadorSerializerObjects(data=evaluadorRegistrar)
