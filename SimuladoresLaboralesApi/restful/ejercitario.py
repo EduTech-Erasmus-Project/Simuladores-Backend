@@ -76,6 +76,22 @@ def obtenerListaDeEscenarios(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getEscenarios(request):
+    try:
+        escenarios = Ejercitario.objects.all()
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND) 
+    ejercitarios = []
+    for escenario in escenarios:
+        informacionEscenario = {
+            'name' : escenario.nombreDeEjercitario,
+            'value' : escenario.numeroDeEjercitario,
+        }
+        ejercitarios.append(informacionEscenario)
+    return Response(ejercitarios)
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))

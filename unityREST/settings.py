@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*','localhost', '127.0.0.1', '172.16.42.127', 'simulab.edutech-project.org']
+ALLOWED_HOSTS = ['*','localhost', '127.0.0.1', '172.16.42.78', 'simulab.edutech-project.org']
 
 
 # Application definition
@@ -158,12 +158,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': [                     
     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-  ],'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-    'NON_FIELD_ERRORS_KEY': 'global',
+  ],
 }
 
 CORS_ORIGIN_ALLOW_ALL: True
