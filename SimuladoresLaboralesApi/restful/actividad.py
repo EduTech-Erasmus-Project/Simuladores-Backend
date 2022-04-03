@@ -76,7 +76,7 @@ def crearNuevaActividadUnity2(request):
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def crearNuevaActividadUnity(request): 
-    print("**********", request.data)
+    
     tiempoInicio = request.data.get('tiempoInicio')
     tiempoFin = request.data.get('tiempoFin')
     fechaDeActividad = request.data.get('fechaDeActividad')
@@ -100,6 +100,7 @@ def crearNuevaActividadUnity(request):
     b = datetime.timedelta(hours=int(tiempoB[0]),minutes=int(tiempoB[1]), seconds=int(tiempoB[2]))
     tiempoTotalResolucionEjercitario = round((((b - a).total_seconds())),2)
     
+    print("**********", tiempoTotalResolucionEjercitario)
     
     nuevaActividadRegistrar = {
         'tiempoInicio' : tiempoInicio,
