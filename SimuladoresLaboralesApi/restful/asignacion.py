@@ -12,6 +12,7 @@ from django.http import JsonResponse
 import datetime
 import statistics
 
+#verificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -19,6 +20,7 @@ def crearNuevaAsignacion(request):
     correoParticipante = request.data.get('participante')
     correoEvaluador = request.data.get('evaluador')
     numeroejercitario = request.data.get('ejercitario')
+
     try: 
         participante = Participante.objects.get(email=correoParticipante) 
         evaluador = Evaluador.objects.get(email=correoEvaluador)  
@@ -43,6 +45,7 @@ def crearNuevaAsignacion(request):
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+#verificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -83,7 +86,7 @@ def agregarAsignacioneParticipante(request):
     
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+#verificar metod
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))

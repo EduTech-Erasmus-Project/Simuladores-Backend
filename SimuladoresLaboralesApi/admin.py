@@ -12,4 +12,5 @@ admin.site.register(Respuesta)
 admin.site.register(Discapacidad)
 admin.site.register(DiscapacidadParticipante)
 admin.site.register(Comentario)
+admin.site.register(Competencia)
 

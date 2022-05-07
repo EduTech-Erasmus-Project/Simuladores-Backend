@@ -29,6 +29,8 @@ def getDiscapacidadesDelParticipante(request,correo):
     
     return JsonResponse({"discapacidadesParticipante":discapacidadesList}, status=status.HTTP_200_OK)
 
+
+#admin role
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarDiscapacidad(request): 

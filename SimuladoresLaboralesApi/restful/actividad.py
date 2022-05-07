@@ -72,6 +72,7 @@ def crearNuevaActividadUnity2(request):
     return Response(nuevaActividadUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+#verificar metdo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))

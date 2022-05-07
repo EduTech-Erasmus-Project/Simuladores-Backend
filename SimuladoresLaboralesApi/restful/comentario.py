@@ -19,7 +19,7 @@ def getComentariosActividadRealizada(request,actividad):
     
     return JsonResponse({"comentarios":list(comentarios)}, status=status.HTTP_200_OK)
 
-
+#verificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def agregarNuevoComentarioActividadParticipante(request):
