@@ -49,20 +49,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'envioREST.apps.EnviorestConfig',
+    'envioREST',
     'rest_framework',
-
     'rest_framework_simplejwt',
-
-    'SimuladoresLaboralesApi.apps.SimuladoreslaboralesapiConfig',
-    'adminApi.apps.AdminapiConfig',
-    'usuario.apps.UsuarioConfig',
+    'SimuladoresLaboralesApi',
+    'adminApi',
     'corsheaders',
     'allauth',
     'allauth.account',
     'rest_auth',
     'rest_auth.registration',
-
+    'usuario',
 ]
 
 MIDDLEWARE = [
@@ -223,28 +220,24 @@ REST_FRAMEWORK = {
 }
 '''
 REST_FRAMEWORK = {
-  'DEFAULT_PERMISSION_CLASSES': [
-    #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-    'SimuladoresLaboralesApi.mixins.ValidateToken',
-  ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        # 'SimuladoresLaboralesApi.mixins.ValidateToken',
+    ],
 }
 
 AUTH_USER_MODEL = 'usuario.Usuario'
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
     'ROTATE_REFRESH_TOKENS': False,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': env('TOKEN_KEY'),
     'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-JWT_AUTH = {
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=10),
 }
