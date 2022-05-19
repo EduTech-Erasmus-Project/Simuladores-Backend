@@ -1,3 +1,4 @@
+from usuario.models import Usuario
 from ..models import *
 from ..serializers import *
 from rest_framework.response import Response
@@ -42,60 +43,52 @@ def verificacionPassword(password):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarParticipante(request):
-
     email = request.data.get('email')
-    passwd = request.data.get('password')
-    if validacionCorreo(email=email) != True:
+    password = request.data.get('password')
+    if not validacionCorreo(email=email):
         return Response({'correo': 'invalido'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-    ''' 
-    if verificacionPassword(password=passwd) != True:
-        return Response({'password': 'incorrecta'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
-    
-    try:
-        responsableEvaluador = Evaluador.objects.get(email=responsable)  
-    except Evaluador.DoesNotExist: 
-        return Response({'responsable': 'noExist'}, status=status.HTTP_404_NOT_FOUND) 
-    '''
-
-    # Creacion de nuevo participante
-    encryptPW = passwordEncriptacion(password=passwd)
-
     data = {
-        'email': request.data.get('email'),
-        'password': encryptPW,
+        'email': email,
+        'password': password,
         'nombre': request.data.get('nombre'),
         'apellido': request.data.get('apellido'),
         'fechaNacimiento': request.data.get('fechaNacimiento'),
         'genero': request.data.get('genero'),
+        'role': request.data.get('role'),
     }
-
     if request.data.get('role') == 'user':
-        seriealizer = RegistroParticipanteSerializerObjects(data=data)
-
-    elif request.data.get('role') == 'expert':
-        seriealizer = RegistroEvaluadorSerializerObjects(data=data)
-    else:
-        return Response({"status": "not_role", "message": "Rol no autorizado"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if seriealizer.is_valid():
-        seriealizer.save()
-        try:
-            if request.data.get('role') == 'user':
+        serializer = RegistroSerializer(data=data)
+        if serializer.is_valid():
+            participante = Participante.objects.create()
+            if request.data.get('discapacidades') is not None:
                 for discapacidad in request.data.get('discapacidades'):
                     data = {
                         'gradoDeDiscapacidad': discapacidad['grado'],
-                        'participante': seriealizer.data['id'],
+                        'participante': participante.id,
                         'discapacidad': discapacidad['code']
                     }
                     discapacidadSerializer = DiscapacidadParticipanteSerializerObjects(data=data)
                     if discapacidadSerializer.is_valid():
                         discapacidadSerializer.save()
-        except:
-            pass
-        return Response({"status": "registrado"}, status=status.HTTP_201_CREATED)
 
-    return Response(seriealizer.errors, status=status.HTTP_400_BAD_REQUEST)
+            user = serializer.save()
+            participante.usuario = user
+            participante.save()
+            return Response({"status": "registrado", "user": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.data.get('role') == 'expert':
+        serializer = RegistroSerializer(data=data)
+        if serializer.is_valid():
+            user = serializer.save()
+            evaluador = Evaluador.objects.create()
+            evaluador.usuario = user
+            evaluador.save()
+
+            return Response({"status": "registrado", "user": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"status": "not_role", "message": "Rol no autorizado"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
 
 
 @api_view(['POST'])

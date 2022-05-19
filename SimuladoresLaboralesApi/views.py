@@ -22,9 +22,11 @@ class ExperienciaLaboralViewSet(viewsets.ModelViewSet):
   queryset = ExperienciaLaboral.objects.all()
   serializer_class = ExperienciaLaboralSerializer
 
+''' 
 class SesionViewSet(viewsets.ModelViewSet):
   queryset = Asignacion.objects.all()
   serializer_class = SesionSerializer
+'''
 
 class EjercitarioViewSet(viewsets.ModelViewSet):
   queryset = Ejercitario.objects.all()
