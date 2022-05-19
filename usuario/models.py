@@ -11,15 +11,15 @@ class Evaluador(models.Model):
         ('rechazado', 'Rechazado'),
         ('aprobado', 'Aprobado'),
     )
-    codigoEvaluador = models.CharField(max_length=6, default=str(shortuuid.ShortUUID().random(length=6)))
     aprobacion = models.CharField(max_length=13, choices=APROBACION_CHOICES, default='pendiente')
     razon = models.TextField(default="La cuenta aún está en revisión, espere la aprobación del administrador.",
                              blank=True, null=True)
     usuario = models.OneToOneField("usuario", on_delete=models.CASCADE, related_name='usuario_evaluador', blank=True,
-                                     null=True)
+                                   null=True)
 
     def __str__(self):
         return self.usuario.email
+
 
 class Participante(models.Model):
     ROL_CHOICES = (
@@ -34,16 +34,19 @@ class Participante(models.Model):
         ('aprobado', 'Aprobado'),
     )
 
-    codigoEstudiante = models.CharField(max_length=6, default=str(shortuuid.ShortUUID().random(length=6)))
-    aceptacionResponsable = models.CharField(max_length=100, blank=False, null=False, default='sin_asignar')
+
+    ref = models.CharField(max_length=64, default=str(shortuuid.ShortUUID().random(length=64)))
+    aceptacionResponsable = models.CharField(max_length=13, choices=APROBACION_CHOICES, default='sin_asignar')
     razon = models.TextField(default="No ha elegido ningún responsable evaluador.", blank=True, null=True)
-    evaluador = models.ForeignKey(Evaluador, on_delete=models.CASCADE, null=True, blank=True, related_name="evaluador_participante")
+    evaluador = models.ForeignKey(Evaluador, on_delete=models.CASCADE, null=True, blank=True,
+                                  related_name="evaluador_participante")
     usuario = models.OneToOneField("Usuario", on_delete=models.CASCADE, related_name='usuario_participante',
-                                        blank=True,
-                                        null=True)
+                                   blank=True,
+                                   null=True)
 
     def __str__(self):
         return self.usuario.email
+
 
 # Create your models here.
 class Usuario(AbstractBaseUser, PermissionsMixin):
@@ -69,6 +72,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     genero = models.CharField(max_length=7, choices=GENERO_CHOICES, blank=True, null=True)
     img = models.ImageField(upload_to='users/', max_length=250, blank=True, null=True)
     tipoUser = models.CharField(max_length=13, choices=ROL_CHOICES, default='participante')
+    codigo = models.CharField(max_length=6, default=str(shortuuid.ShortUUID().random(length=6)))
 
     carreraUniversitaria = models.CharField(max_length=100, blank=True, null=True)
     numeroDeHijos = models.PositiveIntegerField(default=0, blank=True, null=True)
@@ -78,7 +82,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     nivelDeFormacion = models.CharField(max_length=50, blank=True, null=True)
 
     is_staff = models.BooleanField(verbose_name="Django Admin", default=False)
-
 
     objects = UsuarioManager()
 

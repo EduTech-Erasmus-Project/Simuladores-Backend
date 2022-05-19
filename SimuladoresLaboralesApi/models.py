@@ -83,7 +83,6 @@ class Pregunta(models.Model):
 
 # Convertir esta informacion para formatear
 class Actividad(models.Model):
-    #comentario = models.CharField(max_length=1000, blank=True, null=True)
     tiempoInicio = models.CharField(max_length=30, blank=False, null=False)
     tiempoFin = models.CharField(max_length=30, blank=False, null=False)
     tiempoTotal = models.PositiveIntegerField(default=0, blank=False, null=False)
@@ -93,6 +92,7 @@ class Actividad(models.Model):
                                                                                       null=False)
     totalPreguntas = models.PositiveIntegerField(default=0, blank=False, null=False)
     calificacion = models.PositiveIntegerField(default=0, blank=False, null=False)
+    calificacionPorcentaje = models.PositiveIntegerField(default=0, blank=False, null=False)
     ejercitario = models.ForeignKey(Ejercitario, on_delete=models.CASCADE, null=True, blank=True,
                                                 related_name='actividad_ejercitario')
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, null=True, blank=True,
@@ -102,7 +102,7 @@ class Actividad(models.Model):
 
 class Comentario(models.Model):
     comentario = models.TextField(blank=False, null=False)
-    fechaComentario = models.DateTimeField(auto_now=True, null=True)
+    fechaComentario = models.DateTimeField(auto_now_add=True, null=True)
     actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, null=True, blank=True,
                                             related_name='comentario_actividad')
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, null=True, blank=True,

@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
+
+from django.core import serializers
 import hashlib
 
 '''
@@ -42,13 +44,13 @@ def verificarExistenciaCorreo(request):
     return Response({'tipoUsuario': 'notExist'}, status=status.HTTP_200_OK)
 '''
 
-
 ''' 
 def passwordEncriptacion(password):
     encoded = password.encode()
     encryptPW = hashlib.sha256(encoded)
     return encryptPW.hexdigest()
 '''
+
 
 class Login(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -79,18 +81,23 @@ class Login(TokenObtainPairView):
 
             login_serializer = self.serializer_class(data=request.data)
             if login_serializer.is_valid():
-                usuario_Serializer = LoginUserSerializer(user)
+                usuario_Serializer = LoginUserSerializer(user).data
+                if user.tipoUser == "participante":
+                    participante = Participante.objects.get(usuario_id=user.id)
+                    participante_serializer = ParticipanteLoginSerializer(participante)
+                    usuario_Serializer["participante"] = participante_serializer.data
+
                 return Response({
                     "token_access": login_serializer.validated_data.get("access"),
                     "token_refresh": login_serializer.validated_data.get("refresh"),
-                    "user": usuario_Serializer.data
+                    "user": usuario_Serializer
                 }, status=status.HTTP_200_OK)
         return Response({"code": "user_invalid", "message": "Email or password invalid"},
                         status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
-@permission_classes((permissions.IsAuthenticated, )) #IsExpert IsUser IsAdmin
+@permission_classes((permissions.IsAuthenticated,))  # IsExpert IsUser IsAdmin
 def logout(request):
     print(request)
     user = get_object_or_404(Usuario, pk=request.user.id)
@@ -203,6 +210,7 @@ def recuperarUsuarioCookiesJWT(request):
         serializerUser = ParticipanteSerializerObjectsNOPassword(participante)
         return Response(serializerUser.data)
 '''
+
 
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))

@@ -100,15 +100,7 @@ class CompetenciaRetrieveAPIView(RetrieveAPIView):
     queryset = Competencia.objects.all()
 
 
-@api_view(['GET'])
-# @permission_classes((permissions.AllowAny,))
-def getActividadesParticipante(request, idEjercitario, idParticipante):
-    try:
-        actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante_id=idParticipante).values()
-        return Response(actividades, status=status.HTTP_200_OK)
-    except Exception as e:
-        print(e)
-        return Response([], status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])
@@ -525,6 +517,38 @@ class ParticipantesEjercitario(ListAPIView):
         return data
 
 
+class ParticipantesPendientesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="pendiente")
 
 
+class ParticipantesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
 
+    def get_queryset(self):
+        user = self.request.user
+        data = Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="aprobado")
+        print("users", data)
+
+        return data
+
+''' 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def getProgresoPorcentaje(request, pk):
+    try:
+
+        actividad = Actividad.objects.filter(ejercitario_id=pk, participante__usuario_id=request.user.id).order_by("-fecha").first()
+        total = round((actividad.calificacion * 100) / actividad.totalPreguntas, 2)
+        print(total)
+        print(pk)
+        print(actividad)
+        return Response({"total": total})
+    except:
+        return Response({"total": 0})
+'''

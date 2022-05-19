@@ -16,6 +16,7 @@ from django.conf.urls import url
 
 # from SimuladoresLaboralesApi.restful.login import Login
 from SimuladoresLaboralesApi.restful.login import Login
+from usuario.views import EvaluadorRetrieveAPIView
 
 router = routers.DefaultRouter()
 router.register(r'informacionEvaluadores', views.EvaluadorViewSet)
@@ -40,7 +41,7 @@ urlpatterns = [
     url(r'^api/registrarExperienciaLaboral$', experienciaLaboral.registrarExperienciaLaboral),  #
     url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),  #
     url(r'^api/agregarAsignacioneParticipante$', asignacion.agregarAsignacioneParticipante),  #
-    url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),  #
+    url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),  # Verificar
     url(r'^api/agregarNuevoComentarioActividadParticipante$', comentario.agregarNuevoComentarioActividadParticipante),
     # verificar
     url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$',
@@ -70,15 +71,15 @@ urlpatterns = [
     url(r'^api/graficainfoParticipanteIntentosVsNotasTiempo$',
         ejercitario.graficainfoParticipanteIntentosVsNotasTiempo),
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
-    path('api/getParticipante/<int:pk>', participante.getParticipante),  # Terminado
+    path('api/getParticipante/<int:pk>', participante.getParticipante),  # Terminado --
     path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
          participante.getParticipanteDeUnResponsable),
     # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
-    path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
+    #path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
     path('api/getParticipantesEvaluadorAceptados/<str:correo>', evaluador.getParticipantesEvaluadorAceptados),
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
-    path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    #path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
     path('api/agregarParticipanteEvaluador/<str:correo>', evaluador.agregarParticipanteEvaluador),
     path('api/eliminarParticipanteEvaluador/<str:correo>', evaluador.eliminarParticipanteEvaluador),
     path('api/getEjercitarioNumeroDeEjercitario/<int:numeroDeEjercitario>', ejercitario.getEscenarioPorNumero),  #
@@ -106,8 +107,24 @@ urlpatterns = [
     path('api/getCompetencia/<int:pk>', ejercitario.CompetenciaRetrieveAPIView.as_view()),  # Terminado
 
     path('api/getActividadesParticipante/<int:idEjercitario>/<int:idParticipante>',
-         ejercitario.getActividadesParticipante),
+         actividad.getActividadesParticipante),
+
+    path('api/getActividades/<int:idEjercitario>',
+         actividad.getActividades),
 
     path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
+
+    path('api/obtenerParticipantesPendientes/', ejercitario.ParticipantesPendientesListApiView.as_view()),  # terminado
+    path('api/obtenerParticipantes/', ejercitario.ParticipantesListApiView.as_view()),  # terminado
+
+    path('api/aprobarParticipante/', evaluador.aprobarParticipante),  # terminado
+    path('api/comentarios/<int:pk>', actividad.ComentarioListAPIView.as_view()),  # terminado
+    path('api/comentar/', actividad.ComentarioCreateAPIView.as_view()),  # terminado
+
+    path('api/getActividad/<int:pk>', actividad.getActividad),  # terminado
+
+    # path('api/getCompetencias/progreso/<int:pk>', ejercitario.getProgresoPorcentaje),  # Terminado
+
+    path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()), #validar uso de metodo
 
 ]

@@ -161,6 +161,24 @@ class nuevaPreguntaUnitySerializerObjects(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class EjercitarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ejercitario
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        if self.context.tipoUser is not None and self.context.tipoUser == 'participante':
+            try:
+                print("user in serializer", instance["id"])
+                actividad = Actividad.objects.filter(ejercitario_id=instance["id"],
+                                                     participante__usuario_id=self.context.id).order_by(
+                    "-fecha").first()
+                total = round((actividad.calificacion * 100) / actividad.totalPreguntas, 2)
+                instance["progreso"] = total
+            except Exception as e:
+                instance["progreso"] = 0
+        return instance
+
 class CompetenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Competencia
@@ -170,6 +188,11 @@ class CompetenciaSerializer(serializers.ModelSerializer):
         ejercitariosN1 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel1").values()
         ejercitariosN2 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel2").values()
         ejercitariosN3 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel3").values()
+
+        serializer1 = EjercitarioSerializer(ejercitariosN1, many=True, context=self.context['request'].user)
+        serializer2 = EjercitarioSerializer(ejercitariosN2, many=True, context=self.context['request'].user)
+        serializer3 = EjercitarioSerializer(ejercitariosN3, many=True, context=self.context['request'].user)
+
         return {
             "id": instance.id,
             "titulo": instance.titulo,
@@ -178,21 +201,25 @@ class CompetenciaSerializer(serializers.ModelSerializer):
                 {
                     "name": "Nivel 1",
                     "value": "Nivel1",
-                    "ejercitarios": ejercitariosN1
+                    "ejercitarios": serializer1.data
                 },
                 {
                     "name": "Nivel 2",
                     "value": "Nivel2",
-                    "ejercitarios": ejercitariosN2
+                    "ejercitarios": serializer2.data
                 },
                 {
                     "name": "Nivel 3",
                     "value": "Nivel3",
-                    "ejercitarios": ejercitariosN3
+                    "ejercitarios": serializer3.data
                 },
             ]
 
         }
+
+
+
+
 
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
@@ -246,9 +273,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class LoginUserSerializer(serializers.ModelSerializer):
+    participante_ref = serializers.CharField(max_length=64, write_only=True)
     class Meta:
         model = Usuario
-        fields = ("id", "email", "nombre", "apellido", "img", "tipoUser")
+        fields = ("id", "email", "nombre", "apellido", "img", "tipoUser", "participante_ref")
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -257,7 +285,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
-            'nivelDeFormacion'
+            'nivelDeFormacion', 'codigo', 'tipoUser'
         )
 
 
@@ -268,6 +296,13 @@ class ParticipanteSerializer(serializers.ModelSerializer):
         model = Participante
         fields = '__all__'
 
+
+class EvaluadorSerializer(serializers.ModelSerializer):
+    usuario = UsuarioSerializer()
+
+    class Meta:
+        model = Evaluador
+        fields = '__all__'
 
 '''
 class AsignacionUsuarioSerializer(serializers.ModelSerializer):
@@ -305,7 +340,7 @@ class ParticipanteSerializerDiscapacidad(serializers.ModelSerializer):
 
     class Meta:
         model = Participante
-        fields = ('id', 'codigoEstudiante', 'usuario', 'DiscapacidadParticipante')
+        fields = ('id', 'usuario', 'DiscapacidadParticipante')
 
 
 class ActividadSerializer(serializers.ModelSerializer):
@@ -322,20 +357,42 @@ class UsuarioCalificacionGlobalSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, instance):
-        print("---------------")
         participante = Participante.objects.get(usuario_id=instance.id)
         return {
             "id": participante.id,
-            "codigoEstudiante": participante.codigoEstudiante,
             "usuario": {
                 'id': instance.id,
                 'email': instance.email,
                 'nombre': instance.nombre,
                 'apellido': instance.apellido,
                 'genero': instance.genero,
+                'codigo': instance.codigo
             },
             "calificacion": 0,
             "tiempo": 0,
         }
 
 
+class ParticipanteSerializerList(serializers.ModelSerializer):
+    usuario = UsuarioSerializer()
+
+    class Meta:
+        model = Participante
+        fields = ('id', 'usuario',)
+
+
+
+class ComentarioSerializer(serializers.ModelSerializer):
+
+    participante = ParticipanteSerializer()
+    evaluador = EvaluadorSerializer()
+
+    class Meta:
+        model = Comentario
+        fields = '__all__'
+
+
+class ParticipanteLoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participante
+        fields = ('id', 'codigoEstudiante', 'ref', 'evaluador',)
