@@ -43,6 +43,7 @@ def verificacionPassword(password):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarParticipante(request):
+
     email = request.data.get('email')
     password = request.data.get('password')
     if not validacionCorreo(email=email):
@@ -57,6 +58,13 @@ def registrarParticipante(request):
         'role': request.data.get('role'),
     }
     if request.data.get('role') == 'user':
+        try:
+            evaluador = Evaluador.objects.get(usuario__codigo=request.data.get('codigo'))
+        except Exception as e:
+            print(e)
+            return Response({"status": "error", "code": "invalid_code", "message": "Codigo de docente invalido"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
         serializer = RegistroSerializer(data=data)
         if serializer.is_valid():
             participante = Participante.objects.create()
@@ -73,6 +81,9 @@ def registrarParticipante(request):
 
             user = serializer.save()
             participante.usuario = user
+            participante.evaluador = evaluador
+            participante.aceptacionResponsable = "pendiente"
+            participante.razon = "Esperando la aprobación del docente evaluador."
             participante.save()
             return Response({"status": "registrado", "user": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,6 +93,8 @@ def registrarParticipante(request):
             user = serializer.save()
             evaluador = Evaluador.objects.create()
             evaluador.usuario = user
+            evaluador.aceptacionResponsable = "pendiente"
+            evaluador.razon = "Esperando la aprobación de un administrador."
             evaluador.save()
 
             return Response({"status": "registrado", "user": serializer.data}, status=status.HTTP_201_CREATED)

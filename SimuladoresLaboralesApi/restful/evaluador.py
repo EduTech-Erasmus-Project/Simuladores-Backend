@@ -194,13 +194,13 @@ def aprobarParticipante(request):
     aprobacion = request.data.get('estado')
 
     try:
-        participante = Participante.objects.get(id=idParticipante, evaluador__usuario_id=idEvaluador,
-                                                aceptacionResponsable="pendiente")
+        participante = Participante.objects.get(id=idParticipante, evaluador__usuario_id=idEvaluador)
     except:
         return Response({"status": "error", "code": "not_found_participante"}, status=status.HTTP_404_NOT_FOUND)
 
     if aprobacion:
         participante.aceptacionResponsable = "aprobado"
+        participante.razon = ""
     else:
         if razon == "":
             return Response({"status": "error", "code": "not_found_razon"}, status=status.HTTP_400_BAD_REQUEST)

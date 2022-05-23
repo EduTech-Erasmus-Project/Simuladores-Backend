@@ -9,7 +9,7 @@ from rest_framework import permissions
 import datetime
 from django.shortcuts import get_object_or_404
 
-
+''' 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -68,9 +68,9 @@ def crearNuevaActividadUnity2(request):
             return Response({'Actividad': 'noExist'}, status=status.HTTP_404_NOT_FOUND)
 
     return Response(nuevaActividadUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
 
-
-# verificar metdo
+# verificar metdo para envio de datos desde unity
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -78,81 +78,67 @@ def crearNuevaActividadUnity(request):
     tiempoInicio = request.data.get('tiempoInicio')
     tiempoFin = request.data.get('tiempoFin')
     fechaDeActividad = request.data.get('fechaDeActividad')
-
-    # fecha_dt = datetime.strptime(request.data.get('fechaDeActividad'), '%d/%m/%Y %HH%')
-    # print(fecha_dt)
+    preguntas = request.data.get('preguntas')
 
     numeroEjercitario = request.data.get('numeroEjercitario')
     correo = request.data.get('correo')
     try:
-        participante = Participante.objects.get(email=correo)
-        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=numeroEjercitario)
-        preguntasEjercitario = Pregunta.objects.all().filter(preguntaDelEjercitario=ejercitario)
-    except:
-        print("Error en busqueda de correo en participantes o evaluadores")
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        participante = Participante.objects.get(ref=correo)
+        ejercitario = Ejercitario.objects.get(id=numeroEjercitario)
+        preguntasEjercitario = Pregunta.objects.filter(preguntaDelEjercitario=ejercitario)
+    except Exception as e:
+        print("Error", e)
+        return Response({"status": "error", "code": "not-found"}, status=status.HTTP_404_NOT_FOUND)
 
     tiempoA = tiempoInicio.split(':')
     tiempoB = tiempoFin.split(':')
     a = datetime.timedelta(hours=int(tiempoA[0]), minutes=int(tiempoA[1]), seconds=int(tiempoA[2]))
     b = datetime.timedelta(hours=int(tiempoB[0]), minutes=int(tiempoB[1]), seconds=int(tiempoB[2]))
-    tiempoTotalResolucionEjercitario = round((((b - a).total_seconds())), 2)
+    tiempoTotalResolucionEjercitario = round(((b - a).total_seconds()/60), 2)
 
-    print("**********", tiempoTotalResolucionEjercitario)
-
-    nuevaActividadRegistrar = {
+    newActividad = {
         'tiempoInicio': tiempoInicio,
         'tiempoFin': tiempoFin,
-        'fechaDeActividad': fechaDeActividad,
-        'tiempoTotalResolucionEjercitario': tiempoTotalResolucionEjercitario,
-        'ActividadPorEjercitario': ejercitario.idEjercitario,
-        'ActividadDeParticipante': participante.id
+        'fecha': fechaDeActividad,
+        'tiempoTotal': tiempoTotalResolucionEjercitario,
+        'ejercitario': ejercitario.id,
+        'participante': participante.id,
+        'totalPreguntas': len(preguntasEjercitario),
+        'preguntasContestadas': len(preguntas)
     }
 
-    nuevaActividadUnity_serializer = nuevaActividadUnitySerializerObjects(data=nuevaActividadRegistrar)
+    actividadSerializer = nuevaActividadUnitySerializerObjects(data=newActividad)
 
-    if nuevaActividadUnity_serializer.is_valid():
-        nuevaActividadUnity_serializer.save()
-        try:
+    if actividadSerializer.is_valid():
+        actividad = actividadSerializer.save()
+        cont = 0
+        for pregunta in preguntas:
+            for preguntasRespuesta in preguntasEjercitario:
+                if preguntasRespuesta.numeroPregunta == pregunta['numeroPregunta']:
+                    if preguntasRespuesta.respuestaCorrecta == pregunta['respuestaIngresada']:
+                        cont = cont + 1
 
-            actividad = Actividad.objects.order_by('-idActividad')[0]
-            preguntas = request.data.get('preguntas')
-            cont = 0
-            totalPreguntas = 0
-            for pregunta in preguntas:
-                for preguntasRespuesta in preguntasEjercitario:
-                    if (preguntasRespuesta.numeroPregunta == pregunta['numeroPregunta']):
-                        if (preguntasRespuesta.respuestaCorrecta == pregunta['respuestaIngresada']):
-                            cont = cont + 1
-                            totalPreguntas = totalPreguntas + 1
-                        else:
-                            totalPreguntas = totalPreguntas + 1
-                nuevaPreguntaRegistrar = {
-                    'numeroPregunta': pregunta['numeroPregunta'],
-                    'respuestaIngresada': pregunta['respuestaIngresada'],
-                    'tiempoRespuesta': pregunta['tiempoRespuesta'],
-                    'preguntaDeLaActividad': actividad.idActividad
-                }
+            nuevaPreguntaRegistrar = {
+                'numeroPregunta': pregunta['numeroPregunta'],
+                'respuestaIngresada': pregunta['respuestaIngresada'],
+                'tiempoRespuesta': pregunta['tiempoRespuesta'],
+                'preguntaDeLaActividad': actividad.id
+            }
 
-                nuevaPreguntaUnity_serializer = nuevaPreguntaUnitySerializerObjects(data=nuevaPreguntaRegistrar)
-                print(nuevaPreguntaUnity_serializer.is_valid())
-                if nuevaPreguntaUnity_serializer.is_valid():
-                    nuevaPreguntaUnity_serializer.save()
-                else:
-                    return Response(nuevaPreguntaUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            preguntaSerializer = nuevaPreguntaUnitySerializerObjects(data=nuevaPreguntaRegistrar)
+            if preguntaSerializer.is_valid():
+                preguntaSerializer.save()
+            else:
+                return Response(preguntaSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
             # Almacenamiento de calificaciones
-            actividad.totalRespuestasCorrectasIngresadasParticipante = cont
-            actividad.numeroTotalDeRespuestasContestadasPorElParticipante = totalPreguntas
-            actividad.numeroTotalDePreguntasDelEjercitario = len(preguntasEjercitario)
-            actividad.calificacionActividad = (cont * 100 / len(preguntasEjercitario))
-            actividad.save()
+        actividad.preguntasCorrectas = cont
+        actividad.calificacionActividad = (cont * 100 / len(preguntasEjercitario))
+        actividad.save()
 
-            return Response({"status": "actividad registrada"}, status=status.HTTP_201_CREATED)
+        return Response({"status": "ok", "code": "ok"}, status=status.HTTP_201_CREATED)
 
-        except Actividad.DoesNotExist:
-            return Response({'Actividad': 'noExist'}, status=status.HTTP_404_NOT_FOUND)
-
-    return Response(nuevaActividadUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(actividadSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ComentarioListAPIView(ListAPIView):
@@ -185,7 +171,7 @@ class ComentarioCreateAPIView(CreateAPIView):
             )
         try:
             comentario = comentario.save()
-            return Response({"status": "ok", "code":"ok"}, status=status.HTTP_200_OK)
+            return Response({"status": "ok", "code": "ok"}, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({"status": "error", "code": "error"}, status=status.HTTP_400_BAD_REQUEST)
@@ -196,12 +182,12 @@ class ComentarioCreateAPIView(CreateAPIView):
         '''
 
 
-
 @api_view(['GET'])
 @permission_classes((IsExpert,))
 def getActividadesParticipante(request, idEjercitario, idParticipante):
     try:
-        actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante_id=idParticipante).order_by("-fecha").values()
+        actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante_id=idParticipante).order_by(
+            "-fecha").values()
         return Response(actividades, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
@@ -213,24 +199,24 @@ def getActividadesParticipante(request, idEjercitario, idParticipante):
 def getActividades(request, idEjercitario):
     try:
         user = request.user
-        actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante__usuario_id=user.id).order_by("-fecha").values()
+        actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante__usuario_id=user.id).order_by(
+            "-fecha").values()
         return Response(actividades, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
         return Response([], status=status.HTTP_200_OK)
 
 
-
-
 @api_view(['GET'])
-@permission_classes((IsUser,))
+# @permission_classes((IsUser, IsExpert))
 def getActividad(request, pk):
     try:
         user = request.user
-        #print("user in actividad", user)
-        actividad = Actividad.objects.get(pk=pk, ) # proteger con id de estudiante o id de doente logeado participante__usuario_id=user.id
+        # print("user in actividad", user)
+        actividad = Actividad.objects.get(
+            pk=pk, )  # proteger con id de estudiante o id de doente logeado participante__usuario_id=user.id
         serializer = ActividadSerializer(actividad)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
-        return Response({"code": "not_found", "status":"error"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"code": "not_found", "status": "error"}, status=status.HTTP_404_NOT_FOUND)

@@ -526,6 +526,14 @@ class ParticipantesPendientesListApiView(ListAPIView):
         return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="pendiente")
 
 
+class ParticipantesRechazadosListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="rechazado")
+
 class ParticipantesListApiView(ListAPIView):
     serializer_class = ParticipanteSerializerList
     permission_classes = (IsExpert,)

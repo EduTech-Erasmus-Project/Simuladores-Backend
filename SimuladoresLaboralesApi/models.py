@@ -18,8 +18,10 @@ class DiscapacidadParticipante(models.Model):
                                      related_name='DiscapacidadParticipante')
     discapacidad = models.ForeignKey(Discapacidad, on_delete=models.CASCADE, null=True, blank=True,
                                      related_name='TipoDiscapacidad')
+
     def __str__(self):
         return self.gradoDeDiscapacidad
+
 
 class ExperienciaLaboral(models.Model):
     areaLaboral = models.CharField(max_length=50, blank=True, null=True)
@@ -27,8 +29,10 @@ class ExperienciaLaboral(models.Model):
     sectorEconomico = models.CharField(max_length=50, blank=True, null=True)
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, null=True, blank=True,
                                      related_name='ExperienciaParticipante')
+
     def __str__(self):
         return self.areaLaboral
+
 
 class Competencia(models.Model):
     titulo = models.CharField(max_length=50, blank=False, null=False)
@@ -44,7 +48,7 @@ class Ejercitario(models.Model):
         ('Nivel2', 'NIvel 2'),
         ('Nivel3', 'NIvel 3'),
     )
-    #numeroDeEjercitario = models.PositiveIntegerField(default=0, unique=True, blank=False, null=False)
+    # numeroDeEjercitario = models.PositiveIntegerField(default=0, unique=True, blank=False, null=False)
     tipoDeEjercitario = models.CharField(max_length=30, blank=False, null=False)
     nombreDeEjercitario = models.CharField(max_length=256, blank=False, null=False)
     instruccionPrincipalEjercitario = models.TextField(blank=False, null=False)
@@ -59,7 +63,9 @@ class Ejercitario(models.Model):
                                     related_name='competencia_ejercitario')
 
     def __str__(self):
-        return self.nombreDeEjercitario
+        return str(self.id) + " - " + self.nombreDeEjercitario
+
+
 ''' 
 # modelo para la tabla de asiganacion actividades a un participante
 class Asignacion(models.Model):
@@ -73,6 +79,7 @@ class Asignacion(models.Model):
     competencia = models.ForeignKey(Competencia, on_delete=models.CASCADE, null=True, blank=True, related_name='asignacion_competencia')
 '''
 
+
 class Pregunta(models.Model):
     contenido = models.CharField(max_length=300, blank=False, null=False)
     respuestaCorrecta = models.CharField(max_length=100, blank=False, null=False)
@@ -85,30 +92,29 @@ class Pregunta(models.Model):
 class Actividad(models.Model):
     tiempoInicio = models.CharField(max_length=30, blank=False, null=False)
     tiempoFin = models.CharField(max_length=30, blank=False, null=False)
-    tiempoTotal = models.PositiveIntegerField(default=0, blank=False, null=False)
+    tiempoTotal = models.DecimalField(default=0, blank=False, null=False, max_digits=5, decimal_places=2)
     fecha = models.DateTimeField(auto_now=False, null=True)
     preguntasCorrectas = models.PositiveIntegerField(default=0, blank=False, null=False)
     preguntasContestadas = models.PositiveIntegerField(default=0, blank=False,
-                                                                                      null=False)
+                                                       null=False)
     totalPreguntas = models.PositiveIntegerField(default=0, blank=False, null=False)
     calificacion = models.PositiveIntegerField(default=0, blank=False, null=False)
-    calificacionPorcentaje = models.PositiveIntegerField(default=0, blank=False, null=False)
+    #calificacionPorcentaje = models.PositiveIntegerField(default=0, blank=False, null=False)
     ejercitario = models.ForeignKey(Ejercitario, on_delete=models.CASCADE, null=True, blank=True,
-                                                related_name='actividad_ejercitario')
+                                    related_name='actividad_ejercitario')
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, null=True, blank=True,
-                                                related_name='actividad_participante')
-
+                                     related_name='actividad_participante')
 
 
 class Comentario(models.Model):
     comentario = models.TextField(blank=False, null=False)
     fechaComentario = models.DateTimeField(auto_now_add=True, null=True)
     actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, null=True, blank=True,
-                                            related_name='comentario_actividad')
+                                  related_name='comentario_actividad')
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, null=True, blank=True,
-                                  related_name='comentario_participante')
+                                     related_name='comentario_participante')
     evaluador = models.ForeignKey(Evaluador, on_delete=models.CASCADE, null=True, blank=True,
-                                     related_name='comentario_evaluador')
+                                  related_name='comentario_evaluador')
 
 
 class Respuesta(models.Model):
