@@ -169,7 +169,7 @@ class EjercitarioSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         if self.context.tipoUser is not None and self.context.tipoUser == 'participante':
             try:
-                print("user in serializer", instance["id"])
+                #print("user in serializer", instance["id"])
                 actividad = Actividad.objects.filter(ejercitario_id=instance["id"],
                                                      participante__usuario_id=self.context.id).order_by(
                     "-fecha").first()
@@ -178,6 +178,7 @@ class EjercitarioSerializer(serializers.ModelSerializer):
             except Exception as e:
                 instance["progreso"] = 0
         return instance
+
 
 class CompetenciaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -216,10 +217,6 @@ class CompetenciaSerializer(serializers.ModelSerializer):
             ]
 
         }
-
-
-
-
 
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
@@ -273,10 +270,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class LoginUserSerializer(serializers.ModelSerializer):
-    participante_ref = serializers.CharField(max_length=64, write_only=True)
     class Meta:
         model = Usuario
-        fields = ("id", "email", "nombre", "apellido", "img", "tipoUser", "participante_ref")
+        fields = ("id", "email", "nombre", "apellido", "img", "tipoUser", 'codigo')
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -303,6 +299,7 @@ class EvaluadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evaluador
         fields = '__all__'
+
 
 '''
 class AsignacionUsuarioSerializer(serializers.ModelSerializer):
@@ -378,12 +375,10 @@ class ParticipanteSerializerList(serializers.ModelSerializer):
 
     class Meta:
         model = Participante
-        fields = ('id', 'usuario',)
-
+        fields = ('id', 'usuario', 'razon')
 
 
 class ComentarioSerializer(serializers.ModelSerializer):
-
     participante = ParticipanteSerializer()
     evaluador = EvaluadorSerializer()
 
@@ -395,4 +390,26 @@ class ComentarioSerializer(serializers.ModelSerializer):
 class ParticipanteLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = Participante
-        fields = ('id', 'codigoEstudiante', 'ref', 'evaluador',)
+        fields = ('id', 'ref', 'evaluador',)
+
+
+class PerfilSerializers(serializers.ModelSerializer):
+    # discapacidades = DiscapacidadParticipante
+    class Meta:
+        model = Usuario
+        fields = (
+            'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
+            , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
+            'nivelDeFormacion', 'codigo', 'tipoUser',
+        )
+
+
+class ActualizarPerfilSerializers(serializers.ModelSerializer):
+    # discapacidades = DiscapacidadParticipante
+    class Meta:
+        model = Usuario
+        fields = (
+            'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
+            , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
+            'nivelDeFormacion',
+        )

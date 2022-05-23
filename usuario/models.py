@@ -14,7 +14,7 @@ class Evaluador(models.Model):
     aprobacion = models.CharField(max_length=13, choices=APROBACION_CHOICES, default='pendiente')
     razon = models.TextField(default="La cuenta aún está en revisión, espere la aprobación del administrador.",
                              blank=True, null=True)
-    usuario = models.OneToOneField("usuario", on_delete=models.CASCADE, related_name='usuario_evaluador', blank=True,
+    usuario = models.OneToOneField("Usuario", on_delete=models.CASCADE, related_name='usuario_evaluador', blank=True,
                                    null=True)
 
     def __str__(self):
@@ -22,18 +22,12 @@ class Evaluador(models.Model):
 
 
 class Participante(models.Model):
-    ROL_CHOICES = (
-        ('participante', 'Participante'),
-        ('evaluador', 'Evaluador'),
-        ('admin', 'Administrador'),
-    )
     APROBACION_CHOICES = (
         ('sin_asignar', 'Sin Asignar'),
         ('pendiente', 'Pendiente'),
         ('rechazado', 'Rechazado'),
         ('aprobado', 'Aprobado'),
     )
-
 
     ref = models.CharField(max_length=64, default=str(shortuuid.ShortUUID().random(length=64)))
     aceptacionResponsable = models.CharField(max_length=13, choices=APROBACION_CHOICES, default='sin_asignar')
@@ -63,7 +57,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     nombre = models.CharField(max_length=30)
     apellido = models.CharField(max_length=30)
-    telefono = models.CharField(max_length=10, blank=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
     pais = models.CharField(max_length=30, blank=True, null=True)
     ciudad = models.CharField(max_length=30, blank=True, null=True)
     direccion = models.CharField(max_length=100, blank=True, null=True)

@@ -13,10 +13,8 @@ from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLab
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
 from SimuladoresLaboralesApi.restful import comentario as comentario
 from django.conf.urls import url
-
-# from SimuladoresLaboralesApi.restful.login import Login
 from SimuladoresLaboralesApi.restful.login import Login
-from usuario.views import EvaluadorRetrieveAPIView
+from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword
 
 router = routers.DefaultRouter()
 router.register(r'informacionEvaluadores', views.EvaluadorViewSet)
@@ -75,11 +73,11 @@ urlpatterns = [
     path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
          participante.getParticipanteDeUnResponsable),
     # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
-    #path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
+    # path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
     path('api/getParticipantesEvaluadorAceptados/<str:correo>', evaluador.getParticipantesEvaluadorAceptados),
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
-    #path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
     path('api/agregarParticipanteEvaluador/<str:correo>', evaluador.agregarParticipanteEvaluador),
     path('api/eliminarParticipanteEvaluador/<str:correo>', evaluador.eliminarParticipanteEvaluador),
     path('api/getEjercitarioNumeroDeEjercitario/<int:numeroDeEjercitario>', ejercitario.getEscenarioPorNumero),  #
@@ -102,29 +100,22 @@ urlpatterns = [
     path('api/obtenerInformacionLandingPage/', ejercitario.obtenerInformacionLandingPage),
     ##
     path('api/getTotalEjercitarios/', ejercitario.getTotalEjercitarios),  # Terminado
-
     path('api/getCompetencias/', ejercitario.CompetenciasRetrieveAPIView.as_view()),  # Terminado
     path('api/getCompetencia/<int:pk>', ejercitario.CompetenciaRetrieveAPIView.as_view()),  # Terminado
-
     path('api/getActividadesParticipante/<int:idEjercitario>/<int:idParticipante>',
-         actividad.getActividadesParticipante),
-
+         actividad.getActividadesParticipante), #terminado
     path('api/getActividades/<int:idEjercitario>',
-         actividad.getActividades),
-
+         actividad.getActividades), #terminado
     path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
-
     path('api/obtenerParticipantesPendientes/', ejercitario.ParticipantesPendientesListApiView.as_view()),  # terminado
+    path('api/obtenerParticipantesRechazados/', ejercitario.ParticipantesRechazadosListApiView.as_view()),  # terminado
     path('api/obtenerParticipantes/', ejercitario.ParticipantesListApiView.as_view()),  # terminado
-
     path('api/aprobarParticipante/', evaluador.aprobarParticipante),  # terminado
     path('api/comentarios/<int:pk>', actividad.ComentarioListAPIView.as_view()),  # terminado
     path('api/comentar/', actividad.ComentarioCreateAPIView.as_view()),  # terminado
-
     path('api/getActividad/<int:pk>', actividad.getActividad),  # terminado
-
-    # path('api/getCompetencias/progreso/<int:pk>', ejercitario.getProgresoPorcentaje),  # Terminado
-
-    path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()), #validar uso de metodo
+    path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()),  # terminado
+    path('api/perfil/', MiPefilAPIView.as_view()),  # Terminado
+    path('api/actualizarPassword/', actualizarPassword),  # terminado
 
 ]

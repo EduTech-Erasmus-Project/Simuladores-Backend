@@ -79,6 +79,18 @@ class Login(TokenObtainPairView):
                         {"code": "user_rejected", "message": "Evaluador rechazado", "razon": evaluador.razon},
                         status=status.HTTP_400_BAD_REQUEST)
 
+            if user.tipoUser == "participante":
+                participante = Participante.objects.get(usuario_id=user.id)
+                if participante.aceptacionResponsable == "pendiente":
+                    return Response(
+                        {"code": "user_unapproved", "message": "Usuario no aprobado", "razon": participante.razon},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+                if participante.aceptacionResponsable == "rechazado":
+                    return Response(
+                        {"code": "user_rejected", "message": "Usuario rechazado", "razon": participante.razon},
+                        status=status.HTTP_400_BAD_REQUEST)
+
             login_serializer = self.serializer_class(data=request.data)
             if login_serializer.is_valid():
                 usuario_Serializer = LoginUserSerializer(user).data
