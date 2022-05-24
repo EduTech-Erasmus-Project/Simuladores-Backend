@@ -58,22 +58,22 @@ urlpatterns = [
     url(r'^api/graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral$',
         ejercitario.graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral),
     url(r'^api/changePassword$', login.changePassword),
-    url(r'^api/eliminarCuenta$', participante.eliminarCuentaParticipante),
-    url(r'^api/editarCuenta$', participante.editarCuentaParticipante),
-    url(r'^api/changePasswordResponsable$', login.changePasswordResponsable),
-    url(r'^api/eliminarCuentaResponsable$', evaluador.eliminarCuentaResponsable),
-    url(r'^api/editarCuentaResponsable$', evaluador.editarCuentaResponsable),
+    url(r'^api/eliminarCuenta$', participante.eliminarCuentaParticipante), #eliminar
+    url(r'^api/editarCuenta$', participante.editarCuentaParticipante), #eliminar
+    url(r'^api/changePasswordResponsable$', login.changePasswordResponsable), #eliminar
+    url(r'^api/eliminarCuentaResponsable$', evaluador.eliminarCuentaResponsable), #eliminar
+    url(r'^api/editarCuentaResponsable$', evaluador.editarCuentaResponsable), #eliminar
     url(r'^api/obtenerDiscapacidad$', ejercitario.obtenerDiscapacidad),  # Terminado
-    url(r'^api/graficaInfoExpertoTipoDiscapacidadVsNotas$', ejercitario.graficaInfoExpertoTipoDiscapacidadVsNotas),
-    url(r'^api/graficaPastelGeneroPorEjercitario$', ejercitario.graficaPastelGeneroPorEjercitario),
+    url(r'^api/graficaInfoExpertoTipoDiscapacidadVsNotas$', ejercitario.graficaInfoExpertoTipoDiscapacidadVsNotas), #aliminar
+    url(r'^api/graficaPastelGeneroPorEjercitario$', ejercitario.graficaPastelGeneroPorEjercitario), #eliminar
     url(r'^api/graficainfoParticipanteIntentosVsNotasTiempo$',
-        ejercitario.graficainfoParticipanteIntentosVsNotasTiempo),
+        ejercitario.graficainfoParticipanteIntentosVsNotasTiempo), #eliminar
     path('api/getEjercitario/<int:pk>', ejercitario.getEscenario),
     path('api/getParticipante/<int:pk>', participante.getParticipante),  # Terminado --
     path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
          participante.getParticipanteDeUnResponsable),
-    # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
-    # path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
+    # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador), #eliminar
+    # path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo), #eliminar
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
     path('api/getParticipantesEvaluadorAceptados/<str:correo>', evaluador.getParticipantesEvaluadorAceptados),
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
@@ -117,5 +117,5 @@ urlpatterns = [
     path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()),  # terminado
     path('api/perfil/', MiPefilAPIView.as_view()),  # Terminado
     path('api/actualizarPassword/', actualizarPassword),  # terminado
-
+    path('api/informacionCount/', ejercitario.informacionCount),  # terminado
 ]
