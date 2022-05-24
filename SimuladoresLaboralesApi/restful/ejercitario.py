@@ -1,6 +1,10 @@
 from django.db.models import Q, Sum
 
-from ..mixins import ValidateToken
+# from ..mixins import ValidateToken
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+
+from usuario.models import Participante
+from ..mixins import IsExpert
 from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
@@ -70,27 +74,33 @@ def obtenerListaDeEscenarios(request):
     correoEvaluador = request.data.get('evaluador')
     try:
         evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
-        asignaciones = Asignacion.objects.all().filter(evaluador=evaluadorEjer).values()
-        return JsonResponse({"asignaciones": list(asignaciones)})
+        # asignaciones = Asignacion.objects.all().filter(evaluador=evaluadorEjer).values()
+        # return JsonResponse({"asignaciones": list(asignaciones)})
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def getEscenarios(request):
+def getTotalEjercitarios(request):
     try:
-        escenarios = Ejercitario.objects.all()
+        ejercitarios = Ejercitario.objects.all().count()
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    ejercitarios = []
-    for escenario in escenarios:
-        informacionEscenario = {
-            'name': escenario.nombreDeEjercitario,
-            'value': escenario.numeroDeEjercitario,
-        }
-        ejercitarios.append(informacionEscenario)
-    return Response(ejercitarios)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"total": ejercitarios})
+
+
+class CompetenciasRetrieveAPIView(ListAPIView):
+    serializer_class = CompetenciaSerializer
+    queryset = Competencia.objects.all()
+
+
+class CompetenciaRetrieveAPIView(RetrieveAPIView):
+    serializer_class = CompetenciaSerializer
+    queryset = Competencia.objects.all()
+
+
+
 
 
 @api_view(['GET'])
@@ -107,11 +117,11 @@ def getEscenario(request, pk):
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def getEscenarioPorNumero(request, numeroDeEjercitario):
     try:
-        escenario = Ejercitario.objects.get(numeroDeEjercitario=numeroDeEjercitario)
+        escenario = Ejercitario.objects.get(pk=numeroDeEjercitario)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -196,10 +206,11 @@ def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
 
 
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,)) permiso sin token
+@permission_classes((IsExpert,))
 def obtenerTipoGeneroPorEvaluador(request):
-    idEvaluador = request.user["id"]
-    participantes = Participante.objects.filter(responsable__id=idEvaluador, aceptacionPendianteResponsable="aprobado")
+    idEvaluador = request.user.id
+    participantes = Usuario.objects.filter(usuario_participante__evaluador__usuario_id=idEvaluador,
+                                           usuario_participante__aceptacionResponsable="aprobado")
     ListaParticipanteGenero = []
     for participante in participantes:
         ListaParticipanteGenero.append(str(participante.genero))
@@ -209,11 +220,14 @@ def obtenerTipoGeneroPorEvaluador(request):
 
 
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,)) permiso sin token
+@permission_classes((IsExpert,))  # permiso sin token
 def obtenerDiscapacidadesPorEvaluador(request):
-    idEvaluador = request.user["id"]
-    print(idEvaluador)
-    discapacidades = Discapacidad.objects.filter(TipoDiscapacidad__participante__responsable_id=idEvaluador, TipoDiscapacidad__participante__aceptacionPendianteResponsable="aprobado")
+    idEvaluador = request.user.id
+    # print(idEvaluador)
+    # TipoDiscapacidad__participante__aceptacionPendianteResponsable="aprobado"
+    discapacidades = Discapacidad.objects.filter(TipoDiscapacidad__participante__evaluador__usuario_id=idEvaluador,
+                                                 TipoDiscapacidad__participante__aceptacionResponsable="aprobado")
+    # print("discapacidades", discapacidades)
     ListaParticipanteGenero = []
     for dicapacidad in discapacidades:
         ListaParticipanteGenero.append(str(dicapacidad.tipoDiscapacidad))
@@ -223,32 +237,41 @@ def obtenerDiscapacidadesPorEvaluador(request):
 
 
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,)) permiso sin token
+@permission_classes((IsExpert,))  # permiso sin token
 def obtenerParticipantesEjercitarioPorEvaluador(request):
-    idEvaluador = request.user["id"]
-    ejercitarios = Ejercitario.objects.filter(AsignacionEjercitario__evaluador__id=idEvaluador, AsignacionEjercitario__participante__aceptacionPendianteResponsable="aprobado")
-    ListaParticipanteEjercitario = []
-    for ejercitario in ejercitarios:
-        ListaParticipanteEjercitario.append(str(ejercitario.nombreDeEjercitario))
-    counter = Counter(ListaParticipanteEjercitario)
+    idEvaluador = request.user.id
+    # ejercitarios = Ejercitario.objects.filter(AsignacionEjercitario__evaluador__usuario_id=idEvaluador, AsignacionEjercitario__participante__aceptacionResponsable="aprobado")
+
+    # ejercitarios = Ejercitario.objects.filter(competencia__asignacion_competencia__evaluador__usuario_id=idEvaluador,
+    # competencia__asignacion_competencia__participante__aceptacionResponsable="aprobado")
+
+    actividades = Actividad.objects.filter(participante__evaluador__usuario_id=idEvaluador)
+    competencia = Competencia.objects.filter(competencia_ejercitario__actividad_ejercitario__in=actividades)
+
+    # print("ejercitario", ejercitarios)
+    ListaParticipanteCompetencia = []
+    for competencia in competencia:
+        ListaParticipanteCompetencia.append(str(competencia.titulo))
+    counter = Counter(ListaParticipanteCompetencia)
     listaEjercitarioEvaludor = [{key: value} for key, value in counter.items()]
     return JsonResponse({"participanteEjercitario": listaEjercitarioEvaludor}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,)) permiso sin token
+# @permission_classes((permissions.AllowAny,)) permiso sin token
 def contarParticipantesPorEvaluador(request):
-    idEvaluador = request.user["id"]
-    participantes = Participante.objects.all().filter(responsable__id=idEvaluador, aceptacionPendianteResponsable="aprobado").count()
+    idEvaluador = request.user.id
+    participantes = Participante.objects.all().filter(evaluador__usuario_id=idEvaluador,
+                                                      aceptacionResponsable="aprobado").count()
     return JsonResponse({"totalParticipantes": participantes}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.AllowAny,))
 def obtenerDiscapacidad(request):
     try:
         discapacidades = Discapacidad.objects.all().values()
-        return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_201_CREATED)
+        return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -372,17 +395,20 @@ def graficainfoParticipanteIntentosVsNotasTiempo(request):
 
 
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,))
-# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.AllowAny,))
+@permission_classes((IsExpert,))
 def getEstudiantesEjercitarioResponsable(request, ejercitario):
-    responsable = request.user["id"]
-    print(ejercitario)
+    # print("ejercitario", ejercitario)
+    responsable = request.user.id
+    # print("ejercitario", ejercitario)
     try:
-        escenario = Ejercitario.objects.get(numeroDeEjercitario=ejercitario)
-        responsable = Evaluador.objects.get(id=responsable)
-        asignaciones = Asignacion.objects.filter(evaluador=responsable).filter(ejercitario=escenario)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        escenario = Ejercitario.objects.get(pk=ejercitario)
+        responsable = Evaluador.objects.get(usuario_id=responsable)
+        asignaciones = Asignacion.objects.filter(evaluador=responsable, competencia__Competencia__id=escenario.id)
+        # print("asignaciones", asignaciones)
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     participantesList = []
     for asignacion in asignaciones:
         cont = 0
@@ -394,31 +420,35 @@ def getEstudiantesEjercitarioResponsable(request, ejercitario):
                     cont = cont + 1
             if (cont == 0):
                 participantesList.append(asignacion.participante)
-
+    # print("participantesList", participantesList)
     participantesListEjercitarioEvaluador = []
     try:
         for participante in participantesList:
-            participante_serializer = ParticipanteSerializerObjectsNOPassword(participante)
+            participante_serializer = ParticipanteSerializer(participante)
             participantesListEjercitarioEvaluador.append(participante_serializer.data)
 
         return JsonResponse({"participantes": participantesListEjercitarioEvaluador}, status=status.HTTP_200_OK)
-    except:
+    except Exception as e:
+        print(e)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-#metodo ligado con getEstudiantesEjercitarioResponsable
+# metodo ligado con getEstudiantesEjercitarioResponsable
 @api_view(['GET'])
-#@permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getNotasEstudianteEjercitarioResponsable(request, ejercitario, correoParticipante):
+def getNotasEstudianteEjercitarioResponsable(request, ejercitario, idParticipante):
     try:
-        #evaluadorEjer = request.user["id"]
+        evaluadorEjer = request.user.id
         print(ejercitario)
-        print(correoParticipante)
-        participante = Participante.objects.get(email=correoParticipante)
-        ejercitarioAct = Ejercitario.objects.get(numeroDeEjercitario=ejercitario)
-        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario=ejercitarioAct).filter(
-            ActividadDeParticipante=participante)
+        print(idParticipante)
+        participante = Participante.objects.get(pk=idParticipante)
+        ejercitarioAct = Ejercitario.objects.get(pk=ejercitario)
+
+        actividadParticipante = Actividad.objects.filter(ActividadPorEjercitario=ejercitarioAct,
+                                                         ActividadDeParticipante=participante,
+                                                         ejercitario__AsignacionEjercitario__evaluador__usuario_id=evaluadorEjer)
+
         listadoCalificaciones = []
         contCalificaciones = 0
         contCalificacionesTiempo = 0
@@ -445,9 +475,10 @@ def getNotasEstudianteEjercitarioResponsable(request, ejercitario, correoPartici
             }
             listadoCalificaciones.append(diccionarioConParticipantesDict)
 
-        return JsonResponse({"notas": listadoCalificaciones}, status=status.HTTP_201_CREATED)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse({"notas": listadoCalificaciones}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return JsonResponse({"notas": []}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -466,4 +497,66 @@ def obtenerInformacionLandingPage(request):
         }
         return Response(diccionarioLandingPageDict, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ParticipantesEjercitario(ListAPIView):
+    serializer_class = UsuarioCalificacionGlobalSerializer
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        ejercitarios = Ejercitario.objects.filter(competencia_id=self.kwargs['pk'])
+        users = Usuario.objects.filter(usuario_participante__evaluador__usuario_id=user.id)
+        users = users.filter(usuario_participante__actividad_participante__ejercitario_id__in=ejercitarios)
+        data = []
+        for user in users:
+            if user not in data:
+                data.append(user)
+
+        return data
+
+
+class ParticipantesPendientesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="pendiente")
+
+
+class ParticipantesRechazadosListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="rechazado")
+
+class ParticipantesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        data = Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="aprobado")
+        print("users", data)
+
+        return data
+
+''' 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def getProgresoPorcentaje(request, pk):
+    try:
+
+        actividad = Actividad.objects.filter(ejercitario_id=pk, participante__usuario_id=request.user.id).order_by("-fecha").first()
+        total = round((actividad.calificacion * 100) / actividad.totalPreguntas, 2)
+        print(total)
+        print(pk)
+        print(actividad)
+        return Response({"total": total})
+    except:
+        return Response({"total": 0})
+'''
