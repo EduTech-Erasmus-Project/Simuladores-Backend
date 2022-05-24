@@ -545,18 +545,20 @@ class ParticipantesListApiView(ListAPIView):
 
         return data
 
-''' 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def getProgresoPorcentaje(request, pk):
+def informacionCount(request):
     try:
-
-        actividad = Actividad.objects.filter(ejercitario_id=pk, participante__usuario_id=request.user.id).order_by("-fecha").first()
-        total = round((actividad.calificacion * 100) / actividad.totalPreguntas, 2)
-        print(total)
-        print(pk)
-        print(actividad)
-        return Response({"total": total})
+        usuarios = Participante.objects.all().count()
+        ejercitarios = Ejercitario.objects.all().count()
+        competencias = Competencia.objects.all().count()
+        expertos = Evaluador.objects.all().count()
     except:
-        return Response({"total": 0})
-'''
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        "usuarios": usuarios,
+        "ejercitarios": ejercitarios,
+        "expertos": expertos,
+        "competencias": competencias
+    }, status=status.HTTP_200_OK)
