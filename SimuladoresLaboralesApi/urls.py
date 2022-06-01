@@ -106,7 +106,7 @@ urlpatterns = [
          actividad.getActividadesParticipante), #terminado
     path('api/getActividades/<int:idEjercitario>',
          actividad.getActividades), #terminado
-    path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
+   path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
     path('api/obtenerParticipantesPendientes/', ejercitario.ParticipantesPendientesListApiView.as_view()),  # terminado
     path('api/obtenerParticipantesRechazados/', ejercitario.ParticipantesRechazadosListApiView.as_view()),  # terminado
     path('api/obtenerParticipantes/', ejercitario.ParticipantesListApiView.as_view()),  # terminado
