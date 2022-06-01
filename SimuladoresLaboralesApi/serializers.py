@@ -1,3 +1,5 @@
+from dataclasses import field
+from msilib.schema import Class
 from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -217,6 +219,11 @@ class CompetenciaSerializer(serializers.ModelSerializer):
             ]
 
         }
+
+class CompetenciaTotal(serializers.ModelSerializer):
+    class Meta:
+        model = Competencia
+        fields = ('id', 'titulo', 'descripcion')
 
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
