@@ -72,7 +72,7 @@ urlpatterns = [
     path('api/getParticipante/<int:pk>', participante.getParticipante),  # Terminado --
     path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
          participante.getParticipanteDeUnResponsable),
-    # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
+    path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
     # path('api/getEvaluador/<str:correo>', evaluador.getEvaluadorCorreo),
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
     path('api/getParticipantesEvaluadorAceptados/<str:correo>', evaluador.getParticipantesEvaluadorAceptados),
@@ -101,7 +101,9 @@ urlpatterns = [
     ##
     path('api/getTotalEjercitarios/', ejercitario.getTotalEjercitarios),  # Terminado
     path('api/getCompetencias/', ejercitario.CompetenciasRetrieveAPIView.as_view()),  # Terminado
+    path('api/getCompetenciasTotal/', ejercitario.CompetenciaT.as_view()),  # Terminado
     path('api/getCompetencia/<int:pk>', ejercitario.CompetenciaRetrieveAPIView.as_view()),  # Terminado
+  
     path('api/getActividadesParticipante/<int:idEjercitario>/<int:idParticipante>',
          actividad.getActividadesParticipante), #terminado
     path('api/getActividades/<int:idEjercitario>',

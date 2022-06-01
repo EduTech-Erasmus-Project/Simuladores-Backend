@@ -12,3 +12,6 @@ PyJWT
 django-rest-auth 
 django-allauth
 djangorestframework-jwt
+djangorestframework-simplejwt
+shortuuid
+Pillow

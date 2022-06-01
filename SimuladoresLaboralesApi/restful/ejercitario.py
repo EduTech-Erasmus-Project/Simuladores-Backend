@@ -94,11 +94,14 @@ class CompetenciasRetrieveAPIView(ListAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
+class CompetenciaT (ListAPIView):
+    serializer_class = CompetenciaTotal
+    queryset = Competencia.objects.all()
+
 
 class CompetenciaRetrieveAPIView(RetrieveAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
-
 
 
 
