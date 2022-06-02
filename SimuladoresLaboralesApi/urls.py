@@ -89,6 +89,8 @@ urlpatterns = [
      path('api/evaluadorTotalRechazados/', view.listarEvaluladoresRechazado), # Terminado
 
 
+    
+
      
 
 

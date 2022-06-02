@@ -5,6 +5,7 @@ from rest_framework import serializers
 from SimuladoresLaboralesApi.serializers import UsuarioSerializer
 from SimuladoresLaboralesApi.serializers import CompetenciaTotal
 from SimuladoresLaboralesApi.serializers import Ejercitario
+from SimuladoresLaboralesApi.serializers import CompetenciaTotal
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,4 +19,5 @@ class EvaluadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evaluador
         fields = '__all__'
+
 
