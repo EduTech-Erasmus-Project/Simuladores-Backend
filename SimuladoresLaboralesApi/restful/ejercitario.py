@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import EQUAL
 from django.db.models import Q, Sum
 
 # from ..mixins import ValidateToken
@@ -78,6 +79,18 @@ def obtenerListaDeEscenarios(request):
         # return JsonResponse({"asignaciones": list(asignaciones)})
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def getTotalEjercitarios(request):
+
+    ejercitarios = Ejercitario.objects.all()
+    ejercitarios_serializer=EjercitarioSerializerObjects(ejercitarios, many=True)
+
+    return Response ( ejercitarios_serializer.data) 
+
+
 
 
 @api_view(['GET'])
