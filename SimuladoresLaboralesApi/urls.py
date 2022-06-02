@@ -1,4 +1,5 @@
 # SimuladoresLaboralesApi/urls.py
+from django import urls
 from django.urls import include, path
 from rest_framework import routers
 from SimuladoresLaboralesApi import views as views
@@ -14,7 +15,9 @@ from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapac
 from SimuladoresLaboralesApi.restful import comentario as comentario
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
+import adminApi.views as view
 from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword
+
 
 router = routers.DefaultRouter()
 router.register(r'informacionEvaluadores', views.EvaluadorViewSet)
@@ -77,6 +80,18 @@ urlpatterns = [
     path('api/getParticipantesEvaluadorAceptar/<str:correo>', evaluador.getParticipantesEvaluadorAceptar),
     path('api/getParticipantesEvaluadorAceptados/<str:correo>', evaluador.getParticipantesEvaluadorAceptados),
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
+    
+
+     #metodos de Jonnatan
+     path('api/getCompetenciasTotal/', ejercitario.CompetenciaT.as_view()),  # Terminado
+     path('api/evaluadorTotalPendientes/', view.listarEvaluadoresPendientes), # Terminado
+     path('api/evaluadorTotalAprobados/', view.listarEvaluladoresAprobados), # Terminado
+     path('api/evaluadorTotalRechazados/', view.listarEvaluladoresRechazado), # Terminado
+
+
+     
+
+
     # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
     path('api/agregarParticipanteEvaluador/<str:correo>', evaluador.agregarParticipanteEvaluador),
     path('api/eliminarParticipanteEvaluador/<str:correo>', evaluador.eliminarParticipanteEvaluador),
@@ -101,7 +116,7 @@ urlpatterns = [
     ##
     path('api/getTotalEjercitarios/', ejercitario.getTotalEjercitarios),  # Terminado
     path('api/getCompetencias/', ejercitario.CompetenciasRetrieveAPIView.as_view()),  # Terminado
-    path('api/getCompetenciasTotal/', ejercitario.CompetenciaT.as_view()),  # Terminado
+    
     path('api/getCompetencia/<int:pk>', ejercitario.CompetenciaRetrieveAPIView.as_view()),  # Terminado
   
     path('api/getActividadesParticipante/<int:idEjercitario>/<int:idParticipante>',

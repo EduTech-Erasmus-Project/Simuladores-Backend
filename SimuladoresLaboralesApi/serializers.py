@@ -42,6 +42,7 @@ class EjercitarioSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
+
 class ActividadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Actividad
@@ -282,6 +283,7 @@ class LoginUserSerializer(serializers.ModelSerializer):
         fields = ("id", "email", "nombre", "apellido", "img", "tipoUser", 'codigo')
 
 
+
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
@@ -290,6 +292,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
             'nivelDeFormacion', 'codigo', 'tipoUser'
         )
+
 
 
 class ParticipanteSerializer(serializers.ModelSerializer):
