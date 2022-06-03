@@ -1,3 +1,12 @@
+
+from rest_framework.response import  Response
+from rest_framework.views import APIView
+from SimuladoresLaboralesApi.serializers import UsuarioListaSerializer, UsuarioSerializer
+from adminApi.serializers import EvaluadorSerializer
+from usuario.models import Evaluador, Usuario
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import permissions
+
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -72,3 +81,13 @@ def actualizarPassword(request):
         return Response({"status": "ok", "code": "ok"}, status=status.HTTP_200_OK)
     else:
         return Response({"estaus": "error", "code": "old_password_no_valid"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def listarUsuarioRegistrado (request):
+    if request.method == 'GET':
+        usuario = Usuario.objects.all().filter(tipoUser='participante')
+        usuario_serializer =UsuarioSerializer(usuario,many =True)
+        return Response(usuario_serializer.data) 

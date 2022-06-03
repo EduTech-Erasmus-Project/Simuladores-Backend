@@ -13,9 +13,11 @@ from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLaboral
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
 from SimuladoresLaboralesApi.restful import comentario as comentario
+import usuario.views as user 
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
 import adminApi.views as view
+from usuario.models import Usuario as usuario
 from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword
 
 
@@ -126,7 +128,7 @@ urlpatterns = [
          actividad.getActividadesParticipante), #terminado
     path('api/getActividades/<int:idEjercitario>',
          actividad.getActividades), #terminado
-    path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
+   path('api/obtenerParticipantesCompetencia/<int:pk>', ejercitario.ParticipantesEjercitario.as_view()),  # terminado
     path('api/obtenerParticipantesPendientes/', ejercitario.ParticipantesPendientesListApiView.as_view()),  # terminado
     path('api/obtenerParticipantesRechazados/', ejercitario.ParticipantesRechazadosListApiView.as_view()),  # terminado
     path('api/obtenerParticipantes/', ejercitario.ParticipantesListApiView.as_view()),  # terminado
@@ -137,5 +139,9 @@ urlpatterns = [
     path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()),  # terminado
     path('api/perfil/', MiPefilAPIView.as_view()),  # Terminado
     path('api/actualizarPassword/', actualizarPassword),  # terminado
+
+# FabianUrls
+    path('api/listaEjercitario/', ejercitario.listaEjercitario),
+    path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),
 
 ]

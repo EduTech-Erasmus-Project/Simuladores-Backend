@@ -80,6 +80,16 @@ def obtenerListaDeEscenarios(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def listaEjercitario (request):
+    if request.method == 'GET':
+        ejercitario = Ejercitario.objects.all()
+        ejercitario_serializar = EjercitarioCompetenciaSerializer(ejercitario, many =True)
+        return Response(ejercitario_serializar.data)
+
+
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
