@@ -210,3 +210,4 @@ def aprobarParticipante(request):
     participante.save()
 
     return Response({"status": "ok", "code": "ok"}, status=status.HTTP_200_OK)
+

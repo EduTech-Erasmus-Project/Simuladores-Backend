@@ -87,6 +87,7 @@ urlpatterns = [
      path('api/evaluadorTotalPendientes/', view.listarEvaluadoresPendientes), # Terminado
      path('api/evaluadorTotalAprobados/', view.listarEvaluladoresAprobados), # Terminado
      path('api/evaluadorTotalRechazados/', view.listarEvaluladoresRechazado), # Terminado
+     path('api/aprobarEvaluador/', view.aprobarEvaluador),  # terminado
 
 
     
