@@ -42,6 +42,7 @@ class EjercitarioSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
+
 class ActividadSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Actividad
@@ -225,6 +226,17 @@ class CompetenciaTotal(serializers.ModelSerializer):
         model = Competencia
         fields = ('id', 'titulo', 'descripcion')
 
+class EjercitarioCompetenciaSerializer(serializers.ModelSerializer):
+    competencia = CompetenciaTotal()
+    class Meta:
+        model =Ejercitario
+        fields = '__all__'
+
+class UsuarioListaSerializer(serializers.ModelSerializer):
+    usuario = CompetenciaTotal()
+    class Meta:
+        model =Ejercitario
+        fields = '__all__'
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
     competencia = CompetenciaSerializer()
@@ -282,6 +294,7 @@ class LoginUserSerializer(serializers.ModelSerializer):
         fields = ("id", "email", "nombre", "apellido", "img", "tipoUser", 'codigo')
 
 
+
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
@@ -290,6 +303,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
             'nivelDeFormacion', 'codigo', 'tipoUser'
         )
+
 
 
 class ParticipanteSerializer(serializers.ModelSerializer):
