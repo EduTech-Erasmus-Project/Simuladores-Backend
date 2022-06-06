@@ -14,7 +14,7 @@ from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import AccessToken
 from collections import Counter
 
-
+''' 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -42,8 +42,9 @@ def crearNuevoEjercitario(request):
         return Response({"status": "registrado"}, status=status.HTTP_201_CREATED)
 
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
 
-
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -64,7 +65,7 @@ def obtenerAsignacionDeEjercitarioDeUnParticipante(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     return JsonResponse({"asignaciones": list(asignaciones)})
-
+'''
 
 # verificar metodo
 @api_view(['POST'])
@@ -128,7 +129,7 @@ def getEscenarioPorNumero(request, numeroDeEjercitario):
     escenario_serializer = EjercitarioSerializerObjects(escenario)
     return Response(escenario_serializer.data)
 
-
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -180,8 +181,8 @@ def crearGraficaInicioExpertoTipoDiscapacidadVsNota(request):
         return JsonResponse({"participantes": ListaParticipantediscapacidad}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
@@ -203,7 +204,7 @@ def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
         return JsonResponse({"notaGeneral": listaNotaPorEvaluador}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
+'''
 
 @api_view(['GET'])
 @permission_classes((IsExpert,))
@@ -275,7 +276,7 @@ def obtenerDiscapacidad(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaInfoExpertoTipoDiscapacidadVsNotas(request):
@@ -333,8 +334,8 @@ def graficaInfoExpertoTipoDiscapacidadVsNotas(request):
         return JsonResponse({"participantes": ListaParticipantediscapacidad}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaPastelGeneroPorEjercitario(request):
@@ -367,8 +368,8 @@ def graficaPastelGeneroPorEjercitario(request):
         return JsonResponse({"participantes": generosSeresHumanos}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficainfoParticipanteIntentosVsNotasTiempo(request):
@@ -392,8 +393,8 @@ def graficainfoParticipanteIntentosVsNotasTiempo(request):
         return JsonResponse({"participantes": listadoCalificaciones}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
+'''
+'''
 @api_view(['GET'])
 # @permission_classes((permissions.AllowAny,))
 @permission_classes((IsExpert,))
@@ -431,7 +432,7 @@ def getEstudiantesEjercitarioResponsable(request, ejercitario):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
+'''
 
 # metodo ligado con getEstudiantesEjercitarioResponsable
 @api_view(['GET'])

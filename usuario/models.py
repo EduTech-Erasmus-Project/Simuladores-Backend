@@ -32,6 +32,7 @@ class Participante(models.Model):
     ref = models.CharField(max_length=64, default=str(shortuuid.ShortUUID().random(length=64)))
     aceptacionResponsable = models.CharField(max_length=13, choices=APROBACION_CHOICES, default='sin_asignar')
     razon = models.TextField(default="No ha elegido ningún responsable evaluador.", blank=True, null=True)
+
     evaluador = models.ForeignKey(Evaluador, on_delete=models.CASCADE, null=True, blank=True,
                                   related_name="evaluador_participante")
     usuario = models.OneToOneField("Usuario", on_delete=models.CASCADE, related_name='usuario_participante',
@@ -40,6 +41,7 @@ class Participante(models.Model):
 
     def __str__(self):
         return self.usuario.email
+
 
 
 # Create your models here.
@@ -74,6 +76,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     etnia = models.CharField(max_length=30, blank=True, null=True)
     estudiosPrevios = models.CharField(max_length=100, blank=True, null=True)
     nivelDeFormacion = models.CharField(max_length=50, blank=True, null=True)
+    institucion = models.CharField(max_length=100, blank=True, null=True)
 
     is_staff = models.BooleanField(verbose_name="Django Admin", default=False)
 

@@ -66,6 +66,12 @@ class Ejercitario(models.Model):
         return str(self.id) + " - " + self.nombreDeEjercitario
 
 
+class Rubrica(models.Model):
+    calificacion = models.IntegerField(default=0)
+    indicador = models.TextField(blank=True, null=True)
+    ejercitario = models.ForeignKey(Ejercitario, on_delete=models.CASCADE, null=True, blank=True,
+                                    related_name='rubrica_ejercitario')
+
 ''' 
 # modelo para la tabla de asiganacion actividades a un participante
 class Asignacion(models.Model):
@@ -123,3 +129,16 @@ class Respuesta(models.Model):
     tiempoRespuesta = models.CharField(max_length=100, blank=False, null=False)
     preguntaDeLaActividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, null=True, blank=True,
                                               related_name='PreguntaDeActividad')
+
+
+class Certificado(models.Model):
+    fecha = models.DateField(auto_now=True)
+    certificado = models.FileField(blank=True, null=True)
+    competencia = models.ForeignKey(Competencia, on_delete=models.CASCADE, null=True, blank=True,
+                                    related_name="competencia_certificado")
+    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='participante_certificado',
+                                     blank=True,
+                                     null=True)
+
+    def __str__(self):
+        return self.fecha

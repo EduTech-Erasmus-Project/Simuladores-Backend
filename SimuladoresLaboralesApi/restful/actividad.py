@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
+import re
 
 import datetime
 from django.shortcuts import get_object_or_404
@@ -70,6 +71,7 @@ def crearNuevaActividadUnity2(request):
     return Response(nuevaActividadUnity_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 '''
 
+
 # verificar metdo para envio de datos desde unity
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -94,7 +96,7 @@ def crearNuevaActividadUnity(request):
     tiempoB = tiempoFin.split(':')
     a = datetime.timedelta(hours=int(tiempoA[0]), minutes=int(tiempoA[1]), seconds=int(tiempoA[2]))
     b = datetime.timedelta(hours=int(tiempoB[0]), minutes=int(tiempoB[1]), seconds=int(tiempoB[2]))
-    tiempoTotalResolucionEjercitario = round(((b - a).total_seconds()/60), 2)
+    tiempoTotalResolucionEjercitario = round(((b - a).total_seconds() / 60), 2)
 
     newActividad = {
         'tiempoInicio': tiempoInicio,
@@ -115,7 +117,7 @@ def crearNuevaActividadUnity(request):
         for pregunta in preguntas:
             for preguntasRespuesta in preguntasEjercitario:
                 if preguntasRespuesta.numeroPregunta == pregunta['numeroPregunta']:
-                    if preguntasRespuesta.respuestaCorrecta == pregunta['respuestaIngresada']:
+                    if validateWord(preguntasRespuesta.respuestaCorrecta, pregunta['respuestaIngresada']):
                         cont = cont + 1
 
             nuevaPreguntaRegistrar = {
@@ -132,8 +134,9 @@ def crearNuevaActividadUnity(request):
                 return Response(preguntaSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             # Almacenamiento de calificaciones
+        print("cont", cont)
         actividad.preguntasCorrectas = cont
-        actividad.calificacionActividad = (cont * 100 / len(preguntasEjercitario))
+        actividad.calificacion = (cont * 100 / len(preguntasEjercitario))
         actividad.save()
 
         return Response({"status": "ok", "code": "ok"}, status=status.HTTP_201_CREATED)
@@ -141,11 +144,27 @@ def crearNuevaActividadUnity(request):
     return Response(actividadSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def validateWord(correct, test):
+    v = correct.split(",")
+    t = test.split(",")
+    return sorted(v) == sorted(t)
+
+
 class ComentarioListAPIView(ListAPIView):
     serializer_class = ComentarioSerializer
 
     def get_queryset(self):
         return Comentario.objects.filter(actividad_id=self.kwargs['pk']).order_by("fechaComentario")
+
+
+# metodo para sacar preguntas, respuestas y respuesta contestada
+class PreguntasListAPIView(ListAPIView):
+    serializer_class = RespuestaSerializer
+
+    # permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        return Respuesta.objects.filter(preguntaDeLaActividad_id=self.kwargs['pk'])
 
 
 class ComentarioCreateAPIView(CreateAPIView):
@@ -187,7 +206,7 @@ class ComentarioCreateAPIView(CreateAPIView):
 def getActividadesParticipante(request, idEjercitario, idParticipante):
     try:
         actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante_id=idParticipante).order_by(
-            "-fecha").values()
+            "-id").values()
         return Response(actividades, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
@@ -200,13 +219,14 @@ def getActividades(request, idEjercitario):
     try:
         user = request.user
         actividades = Actividad.objects.filter(ejercitario_id=idEjercitario, participante__usuario_id=user.id).order_by(
-            "-fecha").values()
+            "-id").values()
         return Response(actividades, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
         return Response([], status=status.HTTP_200_OK)
 
 
+''' 
 @api_view(['GET'])
 # @permission_classes((IsUser, IsExpert))
 def getActividad(request, pk):
@@ -220,3 +240,9 @@ def getActividad(request, pk):
     except Exception as e:
         print(e)
         return Response({"code": "not_found", "status": "error"}, status=status.HTTP_404_NOT_FOUND)
+'''
+
+
+class ActividadRetrieveAPIView(RetrieveAPIView):
+    serializer_class = ActividadSerializer
+    queryset = Actividad.objects.all()
