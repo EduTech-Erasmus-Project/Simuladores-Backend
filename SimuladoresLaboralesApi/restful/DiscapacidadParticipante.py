@@ -1,4 +1,5 @@
 from ..models import * 
+from rest_framework.generics import  ListAPIView
 from ..serializers import * 
 from rest_framework.response import Response
 from rest_framework import status
@@ -55,3 +56,26 @@ def registrarDiscapacidad(request):
         return Response({"status": "discapacidad registrada"}, status=status.HTTP_201_CREATED) 
     
     return Response(discapacidadRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def getDiscapacidad(request):
+    if request.method == 'GET':
+        discapacidad = Discapacidad.objects.all()
+        discapacidad_serializer = DiscapacidadSerializer(discapacidad, many =True)
+        return Response(discapacidad_serializer.data)
+
+class discapacidadTotal (ListAPIView):
+    serializer_class = DiscapacidadSerializer
+    queryset = Discapacidad.objects.all()
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def regiDiscapacidad(request):
+    discapacidad_serializer = DiscapacidadSerializer(data=request.data)
+    if discapacidad_serializer.is_valid():
+        discapacidad_serializer.save()
+        return Response(discapacidad_serializer.data)

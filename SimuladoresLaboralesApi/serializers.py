@@ -301,7 +301,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
-            'nivelDeFormacion', 'codigo', 'tipoUser'
+            'nivelDeFormacion', 'codigo', 'estado','last_login','tipoUser'
         )
 
 
@@ -341,7 +341,8 @@ class ActividadSerialize(serializers.ModelSerializer):
 class DiscapacidadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discapacidad
-        fields = ('id', 'tipoDiscapacidad')
+        fields = ('__all__')
+
 
 
 class DiscapacidadParticipanteSerializer(serializers.ModelSerializer):

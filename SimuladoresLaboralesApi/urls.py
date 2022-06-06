@@ -84,17 +84,23 @@ urlpatterns = [
     path('api/informacionActividadesParticipante/<str:correo>', participante.informacionActividadesParticipante),
     
 
+
+
+
      #metodos de Jonnatan
-     path('api/getCompetenciasTotal/', ejercitario.CompetenciaT.as_view()),  # Terminado
-     path('api/evaluadorTotalPendientes/', view.listarEvaluadoresPendientes), # Terminado
-     path('api/evaluadorTotalAprobados/', view.listarEvaluladoresAprobados), # Terminado
-     path('api/evaluadorTotalRechazados/', view.listarEvaluladoresRechazado), # Terminado
-     path('api/aprobarEvaluador/', view.aprobarEvaluador),  # terminado
-
-
-    
-
+    path('api/getCompetenciasTotal/', ejercitario.CompetenciaT.as_view()),  # Terminado
+    path('api/evaluadorTotalPendientes/', view.listarEvaluadoresPendientes), # Terminado
+    path('api/evaluadorTotalAprobados/', view.listarEvaluladoresAprobados), # Terminado
+    path('api/evaluadorTotalRechazados/', view.listarEvaluladoresRechazado), # Terminado
+    path('api/aprobarEvaluador/', view.aprobarEvaluador),  # terminado
+    path('api/registroCompetencia/', ejercitario.registroCompetencia),  # terminado
+    path('api/discapacidadListas/', discapacidadParticipante.getDiscapacidad),  # terminado 
+    path('api/regisDiscapacidad/', discapacidadParticipante.regiDiscapacidad),  # terminado 
+    path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador),
      
+
+
+
 
 
     # path('api/getEvaluador/<int:pk>', evaluador.getEvaluador),
