@@ -129,7 +129,7 @@ def getEscenarioPorNumero(request, numeroDeEjercitario):
     escenario_serializer = EjercitarioSerializerObjects(escenario)
     return Response(escenario_serializer.data)
 
-
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -181,8 +181,8 @@ def crearGraficaInicioExpertoTipoDiscapacidadVsNota(request):
         return JsonResponse({"participantes": ListaParticipantediscapacidad}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
@@ -204,7 +204,7 @@ def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
         return JsonResponse({"notaGeneral": listaNotaPorEvaluador}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
+'''
 
 @api_view(['GET'])
 @permission_classes((IsExpert,))

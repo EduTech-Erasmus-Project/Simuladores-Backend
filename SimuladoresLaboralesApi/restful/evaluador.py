@@ -1,22 +1,11 @@
-from importlib_metadata import email
-
 from ..mixins import IsExpert
-from ..models import *
 from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-import hashlib
 from django.http import JsonResponse
-
-
-def passwordEncriptacion(password):
-    encoded = password.encode()
-    encryptPW = hashlib.sha256(encoded)
-    return encryptPW.hexdigest()
-
-
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -28,7 +17,7 @@ def getEvaluador(request, pk):
 
     evaluador_serializer = EvaluadorSerializerObjectsNOPassword(evaluador)
     return Response(evaluador_serializer.data)
-
+'''
 '''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))

@@ -1,20 +1,12 @@
-from datetime import datetime
-from multiprocessing import AuthenticationError
-
-import jwt
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
-from unityREST import settings
-from ..mixins import IsAdmin, IsExpert
 from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 
-from django.core import serializers
-import hashlib
 
 '''
 @api_view(['POST'])

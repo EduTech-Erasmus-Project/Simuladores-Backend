@@ -1,7 +1,5 @@
 # SimuladoresLaboralesApi/urls.py
-from django.urls import include, path
-from rest_framework import routers
-from SimuladoresLaboralesApi import views as views
+from django.urls import path
 from SimuladoresLaboralesApi.restful import login as login
 from SimuladoresLaboralesApi.restful import registrar as registrar
 from SimuladoresLaboralesApi.restful import ejercitario as ejercitario
@@ -9,7 +7,6 @@ from SimuladoresLaboralesApi.restful import actividad as actividad
 from SimuladoresLaboralesApi.restful import participante as participante
 from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLaboral
-from SimuladoresLaboralesApi.restful import comentario as comentario
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
 from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, actualizarImagenPerfil
@@ -38,23 +35,23 @@ urlpatterns = [
     #url(r'^api/registrarAsignacion$', asignacion.crearNuevaAsignacion),  # eliminar
     #url(r'^api/agregarAsignacioneParticipante$', asignacion.agregarAsignacioneParticipante),  # eliminar
     url(r'^api/registrarActividad$', actividad.crearNuevaActividadUnity),  # Terminado
-    url(r'^api/agregarNuevoComentarioActividadParticipante$', comentario.agregarNuevoComentarioActividadParticipante),
+    #url(r'^api/agregarNuevoComentarioActividadParticipante$', comentario.agregarNuevoComentarioActividadParticipante),
     # verificar
     #url(r'^api/obtenerAsignacionesEjercitariosDeParticipante$',
         #ejercitario.obtenerAsignacionDeEjercitarioDeUnParticipante),  #
     #url(r'^api/tiempoTotalResolucionCompletaPorEjercitario$', asignacion.tiempoTotalResolucionCompletaPorEjercitario),
     # verificar
     url(r'^api/obtenerListaDeEscenarios$', ejercitario.obtenerListaDeEscenarios),  #
-    url(r'^api/crearGraficaInicioExpertoTipoDiscapacidadVsNota$',
-        ejercitario.crearGraficaInicioExpertoTipoDiscapacidadVsNota),
+    #url(r'^api/crearGraficaInicioExpertoTipoDiscapacidadVsNota$',
+        #ejercitario.crearGraficaInicioExpertoTipoDiscapacidadVsNota),
     url(r'^api/obtenerTipoGeneroPorEvaluador$', ejercitario.obtenerTipoGeneroPorEvaluador),  # Terminaod
     url(r'^api/obtenerDiscapacidadesPorEvaluador$', ejercitario.obtenerDiscapacidadesPorEvaluador),  # Terminado
     url(r'^api/obtenerParticipantesEjercitarioPorEvaluador$', ejercitario.obtenerParticipantesEjercitarioPorEvaluador),
     # Terminado
 
     url(r'^api/totalParticipantesPorEvaluador$', ejercitario.contarParticipantesPorEvaluador),  # Terminado
-    url(r'^api/graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral$',
-        ejercitario.graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral),
+    #url(r'^api/graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral$',
+        #ejercitario.graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral),
     #url(r'^api/changePassword$', login.changePassword),
     # url(r'^api/eliminarCuenta$', participante.eliminarCuentaParticipante),  # eliminar
     # url(r'^api/editarCuenta$', participante.editarCuentaParticipante),  # eliminar
@@ -90,7 +87,7 @@ urlpatterns = [
          #discapacidadParticipante.getDiscapacidadesDelParticipante),
     path('api/getParticipantesIntentosEjercitario/<str:correo>/<int:ejercitario>',
          participante.getParticipantesIntentosEjercitario),
-    path('api/getComentariosActividadRealizada/<int:actividad>', comentario.getComentariosActividadRealizada),
+    # path('api/getComentariosActividadRealizada/<int:actividad>', comentario.getComentariosActividadRealizada),
     path('api/getEvaluadores/', evaluador.getEvaluadores),
     # path('api/getUsuarioCookiesJWT/', login.recuperarUsuarioCookiesJWT),
     #path('api/obtenerInformacionAsignacionesParticipante/<str:correo>/<str:correoResponsable>',
