@@ -29,7 +29,7 @@ def getEvaluador(request, pk):
     evaluador_serializer = EvaluadorSerializerObjectsNOPassword(evaluador)
     return Response(evaluador_serializer.data)
 
-
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -41,8 +41,8 @@ def getEvaluadorCorreo(request, correo):
 
     evaluador_serializer = EvaluadorSerializerObjectsNOPassword(evaluador)
     return Response(evaluador_serializer.data)
-
-
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -61,8 +61,8 @@ def eliminarCuentaResponsable(request):
         return Response({'delete': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'delete': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -86,8 +86,8 @@ def editarCuentaResponsable(request):
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+'''
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -108,7 +108,8 @@ def getParticipantesEvaluadorAceptar(request, correo):
     except:
         return Response({'participantesAceptacion': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+'''
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -129,7 +130,8 @@ def getParticipantesEvaluadorAceptados(request, correo):
     except:
         return Response({'participantesAceptacion': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+'''
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -146,7 +148,8 @@ def agregarParticipanteEvaluador(request, correo):
     except:
         return Response({'participantesAceptacion': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+'''
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -162,7 +165,7 @@ def eliminarParticipanteEvaluador(request, correo):
         return JsonResponse({"participantesAceptacion": 'aceptado'}, status=status.HTTP_200_OK)
     except:
         return Response({'participantesAceptacion': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
+'''
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))

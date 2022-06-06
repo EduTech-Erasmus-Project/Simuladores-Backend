@@ -223,7 +223,7 @@ def recuperarUsuarioCookiesJWT(request):
         return Response(serializerUser.data)
 '''
 
-
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -244,8 +244,8 @@ def changePassword(request):
         return Response({'change': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'change': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -266,3 +266,4 @@ def changePasswordResponsable(request):
         return Response({'change': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'change': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+'''

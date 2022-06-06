@@ -12,6 +12,7 @@ from django.http import JsonResponse
 import datetime
 import statistics
 
+''' 
 #verificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -44,7 +45,9 @@ def crearNuevaAsignacion(request):
     
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+'''
 
+'''
 #verificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -85,7 +88,9 @@ def agregarAsignacioneParticipante(request):
         return Response(informacionAsignacion, status=status.HTTP_201_CREATED) 
     
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
 
+'''
 #verificar metod
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -133,8 +138,9 @@ def tiempoTotalResolucionCompletaPorEjercitario(request):
         return Response({"tiempo": round((statistics.mean(listadoTiempo)/60),2)}, status=status.HTTP_201_CREATED) 
     except: 
         return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    
+'''
+
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 #@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -149,3 +155,4 @@ def eliminarAsignacion(request,idAsignacion):
         return JsonResponse({"asignacion":'delete'}, status=status.HTTP_204_NO_CONTENT)
     except:
         return Response({'asignacion': 'error'},status=status.HTTP_400_BAD_REQUEST)
+'''
