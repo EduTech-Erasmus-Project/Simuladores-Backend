@@ -66,3 +66,21 @@ def aprobarEvaluador(request):
     evaluador.save()
 
     return Response({"status": "ok", "code": "ok"}, status=status.HTTP_200_OK)
+
+#Competencia Aprobar
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def bloqueoEvaluador(request,pk=None):
+    if request.method == 'GET':
+        usuario = Usuario.objects.get(id=pk)
+        if usuario.estado == True:
+            usuario.estado=False
+            usuario.save()
+            usuario_serilizer = UsuarioSerializer(usuario)
+            return Response(usuario_serilizer.data, status=status.HTTP_200_OK)
+        elif usuario.estado == False:
+            usuario.estado=True
+            usuario.save()
+            usuario_serilizer = UsuarioSerializer(usuario)
+            return Response(usuario_serilizer.data, status=status.HTTP_200_OK)
+

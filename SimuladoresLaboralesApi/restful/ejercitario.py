@@ -115,6 +115,15 @@ class CompetenciaRetrieveAPIView(RetrieveAPIView):
     queryset = Competencia.objects.all()
 
 
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def registroCompetencia(request):
+    competencia_serializer = CompetenciaTotal(data=request.data)
+    if competencia_serializer.is_valid():
+        competencia_serializer.save()
+        return Response(competencia_serializer.data)
+    return Response(competencia_serializer.errors)  
+
 
 
 @api_view(['GET'])

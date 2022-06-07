@@ -169,7 +169,7 @@ def eliminarParticipanteEvaluador(request, correo):
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def getEvaluadores(request):
     try:
-        evaluadores = Evaluador.objects.all()
+        evaluadores = Evaluador.objects.all().count()
         evaluadorList = []
         for evaluador in evaluadores:
             evaluadorJSON = {
