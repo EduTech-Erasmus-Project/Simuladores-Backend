@@ -1,14 +1,7 @@
-from dataclasses import field
-from msilib.schema import Class
-import json
-from django.contrib.auth.models import update_last_login
 from django.forms import model_to_dict
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from usuario.models import Usuario, Participante, Evaluador
+from usuario.models import Usuario
 from .models import *
 
 
