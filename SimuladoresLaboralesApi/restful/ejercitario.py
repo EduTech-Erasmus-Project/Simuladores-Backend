@@ -291,12 +291,14 @@ def contarParticipantesPorEvaluador(request):
 
 
 @api_view(['GET'])
-# @permission_classes((permissions.AllowAny,))
+@permission_classes((permissions.AllowAny,))
 def obtenerDiscapacidad(request):
+    print(request)
     try:
         discapacidades = Discapacidad.objects.all().values()
         return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_200_OK)
-    except:
+    except Exception as e:
+        print("error", e)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 '''
