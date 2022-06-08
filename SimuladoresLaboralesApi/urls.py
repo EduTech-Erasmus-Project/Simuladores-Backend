@@ -1,8 +1,3 @@
-# SimuladoresLaboralesApi/urls.py
-from django import urls
-from django.urls import include, path
-from rest_framework import routers
-from SimuladoresLaboralesApi import views as views
 from django.urls import path
 from SimuladoresLaboralesApi.restful import login as login
 from SimuladoresLaboralesApi.restful import registrar as registrar
@@ -13,20 +8,12 @@ from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLaboral
 
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
-from SimuladoresLaboralesApi.restful import comentario as comentario
 import usuario.views as user
-from django.conf.urls import url
-from SimuladoresLaboralesApi.restful.login import Login
 import adminApi.views as view
-from usuario.models import Usuario as usuario
-from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword
-
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
 from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, actualizarImagenPerfil
 
-# router = routers.DefaultRouter()
-# router.register(r'informacionEvaluadores', views.EvaluadorViewSet)
 
 urlpatterns = [
     # path('api/info/', include(router.urls)),

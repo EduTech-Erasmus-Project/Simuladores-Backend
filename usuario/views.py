@@ -1,21 +1,11 @@
-
-from rest_framework.response import  Response
-from rest_framework.views import APIView
-from SimuladoresLaboralesApi.serializers import UsuarioListaSerializer, UsuarioSerializer
-from adminApi.serializers import EvaluadorSerializer
-from usuario.models import Evaluador, Usuario
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView, ListAPIView
-# Create your views here.
 from rest_framework.views import APIView
 from pathlib import Path
-import os
 
 from SimuladoresLaboralesApi.models import DiscapacidadParticipante
 from SimuladoresLaboralesApi.serializers import UsuarioSerializer, EvaluadorSerializer, PerfilSerializers, \
@@ -23,6 +13,7 @@ from SimuladoresLaboralesApi.serializers import UsuarioSerializer, EvaluadorSeri
 from usuario.models import Usuario, Evaluador, Participante
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 class EvaluadorRetrieveAPIView(RetrieveAPIView):
     queryset = Evaluador.objects.all()
@@ -59,7 +50,6 @@ class MiPefilAPIView(APIView):
                 participante = Participante.objects.get(usuario_id=user.id)
                 DiscapacidadParticipante.objects.filter(participante_id=participante.id).delete()
                 for discapacidad in discapacidades:
-
                     obj = DiscapacidadParticipante(gradoDeDiscapacidad=discapacidad["grado"],
                                                    participante_id=participante.id, discapacidad_id=discapacidad["id"])
                     obj.save()
@@ -93,11 +83,12 @@ def actualizarPassword(request):
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def listarUsuarioRegistrado (request):
+def listarUsuarioRegistrado(request):
     if request.method == 'GET':
         usuario = Usuario.objects.all().filter(tipoUser='participante')
-        usuario_serializer =UsuarioSerializer(usuario,many =True)
-        return Response(usuario_serializer.data) 
+        usuario_serializer = UsuarioSerializer(usuario, many=True)
+        return Response(usuario_serializer.data)
+
 
 @api_view(['PUT'])
 def actualizarImagenPerfil(request):
