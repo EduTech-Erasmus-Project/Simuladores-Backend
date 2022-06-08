@@ -1,20 +1,12 @@
-from datetime import datetime
-from multiprocessing import AuthenticationError
-
-import jwt
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
-from unityREST import settings
-from ..mixins import IsAdmin, IsExpert
 from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 
-from django.core import serializers
-import hashlib
 
 '''
 @api_view(['POST'])
@@ -223,7 +215,7 @@ def recuperarUsuarioCookiesJWT(request):
         return Response(serializerUser.data)
 '''
 
-
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -244,8 +236,8 @@ def changePassword(request):
         return Response({'change': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'change': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -266,3 +258,4 @@ def changePasswordResponsable(request):
         return Response({'change': 'ok'}, status=status.HTTP_200_OK)
     except:
         return Response({'change': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+'''
