@@ -82,8 +82,8 @@ def registrarParticipante(request):
             user = serializer.save()
             participante.usuario = user
             participante.evaluador = evaluador
-            participante.aceptacionResponsable = "pendiente"
-            participante.razon = "Esperando la aprobación del docente evaluador."
+            participante.aceptacionResponsable = "aprobado" #Estado de la aprobacion con codigo
+            #participante.razon = ""
             participante.save()
             return Response({"status": "registrado", "user": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
