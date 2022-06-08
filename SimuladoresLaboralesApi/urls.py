@@ -16,9 +16,10 @@ from SimuladoresLaboralesApi.restful import comentario as comentario
 import usuario.views as user 
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
+
 import adminApi.views as view
 from usuario.models import Usuario as usuario
-from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword
+from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, listarUsuarioRegistrado
 
 
 router = routers.DefaultRouter()
@@ -147,7 +148,8 @@ urlpatterns = [
     path('api/actualizarPassword/', actualizarPassword),  # terminado
 
 # FabianUrls
-    path('api/listaEjercitario/', ejercitario.listaEjercitario),
-    path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),
+    path('api/listaEjercitario/', ejercitario.listaEjercitario),#terminado
+    path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),#terminado
+#   path('api/bloqueoCuenta/<int:pk>', view.bloqueoUsuario),
 
 ]
