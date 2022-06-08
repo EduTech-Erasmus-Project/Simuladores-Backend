@@ -7,6 +7,7 @@ from usuario.models import Participante, Evaluador
 
 class Discapacidad(models.Model):
     tipoDiscapacidad = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    descripcion = models.CharField(max_length=300, blank=True, null=False)
 
     def __str__(self):
         return self.tipoDiscapacidad

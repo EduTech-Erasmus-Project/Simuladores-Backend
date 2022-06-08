@@ -7,6 +7,24 @@ coreschema==0.0.4
 cryptography==36.0.2
 defusedxml==0.7.1
 Django==3.2.7
+<<<<<<< HEAD
+djangorestframework
+drf-yasg
+gunicorn
+polls
+markdown
+django-filter
+psycopg2
+django-environ
+django-cors-headers
+PyJWT
+django-rest-auth 
+django-allauth
+djangorestframework-jwt
+djangorestframework-simplejwt
+shortuuid
+Pillow
+=======
 django-allauth==0.50.0
 django-cors-headers==3.11.0
 django-environ==0.8.1
@@ -36,3 +54,4 @@ uritemplate==4.1.1
 urllib3==1.26.9
 uuid==1.30
 zipp==3.8.0
+>>>>>>> dev

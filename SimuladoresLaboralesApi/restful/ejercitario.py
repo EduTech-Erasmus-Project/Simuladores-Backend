@@ -1,3 +1,4 @@
+from turtle import title
 from django.db.models import Q, Sum
 
 # from ..mixins import ValidateToken
@@ -80,6 +81,16 @@ def obtenerListaDeEscenarios(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def listaEjercitario (request):
+    if request.method == 'GET':
+        ejercitario = Ejercitario.objects.all()
+        ejercitario_serializar = EjercitarioCompetenciaSerializer(ejercitario, many =True)
+        return Response(ejercitario_serializar.data)
+
+
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
@@ -95,12 +106,24 @@ class CompetenciasRetrieveAPIView(ListAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
+class CompetenciaT (ListAPIView):
+    serializer_class = CompetenciaTotal
+    queryset = Competencia.objects.all()
+
 
 class CompetenciaRetrieveAPIView(RetrieveAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
 
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def registroCompetencia(request):
+    competencia_serializer = CompetenciaTotal(data=request.data)
+    if competencia_serializer.is_valid():
+        competencia_serializer.save()
+        return Response(competencia_serializer.data)
+    return Response(competencia_serializer.errors)  
 
 
 

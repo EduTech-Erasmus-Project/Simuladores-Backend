@@ -33,11 +33,12 @@ def getParticipante(request, pk):
     serializer = ParticipanteSerializerDiscapacidad(participante)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+''' 
 def passwordEncriptacion(password):
     encoded = password.encode()
     encryptPW = hashlib.sha256(encoded)
     return encryptPW.hexdigest()
+'''
 
 '''
 @api_view(['GET'])

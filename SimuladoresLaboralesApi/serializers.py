@@ -1,5 +1,6 @@
+from dataclasses import field
+from msilib.schema import Class
 import json
-
 from django.contrib.auth.models import update_last_login
 from django.forms import model_to_dict
 from rest_framework import serializers
@@ -220,15 +221,17 @@ class CompetenciaSerializer(serializers.ModelSerializer):
                     "name": "Nivel 2",
                     "value": "Nivel2",
                     "ejercitarios": serializer2.data,
-                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(serializer1)
-                    #sum(item['progreso'] for item in serializer1.data) / len(serializer1.data) == 100
+                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(
+                        serializer1)
+                    # sum(item['progreso'] for item in serializer1.data) / len(serializer1.data) == 100
                 },
                 {
                     "name": "Nivel 3",
                     "value": "Nivel3",
                     "ejercitarios": serializer3.data,
-                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(serializer2)
-                    #sum(item['progreso'] for item in serializer2.data) / len(serializer2.data) == 100
+                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(
+                        serializer2)
+                    # sum(item['progreso'] for item in serializer2.data) / len(serializer2.data) == 100
                 },
             ]
         }
@@ -238,6 +241,28 @@ class CompetenciaSerializer(serializers.ModelSerializer):
             return False
         else:
             sum(item['progreso'] for item in serializer.data) / len(serializer.data) == 100
+
+
+class CompetenciaTotal(serializers.ModelSerializer):
+    class Meta:
+        model = Competencia
+        fields = ('id', 'titulo', 'descripcion')
+
+
+class EjercitarioCompetenciaSerializer(serializers.ModelSerializer):
+    competencia = CompetenciaTotal()
+
+    class Meta:
+        model = Ejercitario
+        fields = '__all__'
+
+
+class UsuarioListaSerializer(serializers.ModelSerializer):
+    usuario = CompetenciaTotal()
+
+    class Meta:
+        model = Ejercitario
+        fields = '__all__'
 
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
@@ -302,7 +327,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
-            'nivelDeFormacion', 'codigo', 'tipoUser', 'img'
+            'nivelDeFormacion', 'codigo', 'estado', 'last_login', 'tipoUser', 'img'
         )
 
 
@@ -341,7 +366,7 @@ class ActividadSerialize(serializers.ModelSerializer):
 class DiscapacidadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discapacidad
-        fields = ('id', 'tipoDiscapacidad')
+        fields = ('__all__')
 
 
 class DiscapacidadParticipanteSerializer(serializers.ModelSerializer):
