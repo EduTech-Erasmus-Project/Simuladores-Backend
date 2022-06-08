@@ -193,13 +193,16 @@ class CompetenciaSerializer(serializers.ModelSerializer):
         fields = ('id', 'titulo', 'descripcion')
 
     def to_representation(self, instance):
-        ejercitariosN1 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel1").values()
-        ejercitariosN2 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel2").values()
-        ejercitariosN3 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel3").values()
-
-        serializer1 = EjercitarioSerializer(ejercitariosN1, many=True, context=self.context['request'].user)
-        serializer2 = EjercitarioSerializer(ejercitariosN2, many=True, context=self.context['request'].user)
-        serializer3 = EjercitarioSerializer(ejercitariosN3, many=True, context=self.context['request'].user)
+        try:
+            ejercitariosN1 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel1").values()
+            ejercitariosN2 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel2").values()
+            ejercitariosN3 = Ejercitario.objects.filter(competencia_id=instance.id, nivel="Nivel3").values()
+            serializer1 = EjercitarioSerializer(ejercitariosN1, many=True, context=self.context['request'].user)
+            serializer2 = EjercitarioSerializer(ejercitariosN2, many=True, context=self.context['request'].user)
+            serializer3 = EjercitarioSerializer(ejercitariosN3, many=True, context=self.context['request'].user)
+        except Exception as e:
+            print(e)
+            return {}
 
         return {
             "id": instance.id,
@@ -217,19 +220,24 @@ class CompetenciaSerializer(serializers.ModelSerializer):
                     "name": "Nivel 2",
                     "value": "Nivel2",
                     "ejercitarios": serializer2.data,
-                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else sum(
-                        item['progreso'] for item in serializer1.data) / len(serializer1.data) == 100
+                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(serializer1)
+                    #sum(item['progreso'] for item in serializer1.data) / len(serializer1.data) == 100
                 },
                 {
                     "name": "Nivel 3",
                     "value": "Nivel3",
                     "ejercitarios": serializer3.data,
-                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else sum(
-                        item['progreso'] for item in serializer2.data) / len(serializer2.data) == 100
+                    "status": True if self.context['request'].user.tipoUser == 'evaluador' else self.calculate(serializer2)
+                    #sum(item['progreso'] for item in serializer2.data) / len(serializer2.data) == 100
                 },
             ]
-
         }
+
+    def calculate(self, serializer):
+        if len(serializer.data) == 0:
+            return False
+        else:
+            sum(item['progreso'] for item in serializer.data) / len(serializer.data) == 100
 
 
 class EjercitarioSerializerObjects(serializers.ModelSerializer):
