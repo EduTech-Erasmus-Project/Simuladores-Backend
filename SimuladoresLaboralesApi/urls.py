@@ -12,7 +12,11 @@ import usuario.views as user
 import adminApi.views as view
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
-from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, actualizarImagenPerfil
+import adminApi.views as view
+from usuario.models import Usuario as usuario
+from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, listarUsuarioRegistrado
+
+
 
 
 urlpatterns = [
@@ -133,6 +137,12 @@ urlpatterns = [
     path('api/actualizarPassword/', actualizarPassword),  # terminado
     path('api/informacionCount/', ejercitario.informacionCount),  # terminado
     path('api/reporte/<int:idCompetencia>/<int:idParticipante>', participante.getReporte),  # terminado
+
+
+# FabianUrls
+    path('api/listaEjercitario/', ejercitario.listaEjercitario),#terminado
+    path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),#terminado
+#   path('api/bloqueoCuenta/<int:pk>', view.bloqueoUsuario),
 
     # certificados
     path('api/descargarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.descargar_certificado),
