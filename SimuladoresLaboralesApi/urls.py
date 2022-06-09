@@ -12,8 +12,9 @@ import usuario.views as user
 import adminApi.views as view
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
-from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, actualizarImagenPerfil
-
+import adminApi.views as view
+from usuario.models import Usuario as usuario
+from usuario.views import EvaluadorRetrieveAPIView, MiPefilAPIView, actualizarPassword, listarUsuarioRegistrado
 
 urlpatterns = [
     # path('api/info/', include(router.urls)),
@@ -129,10 +130,15 @@ urlpatterns = [
     path('api/getActividad/<int:pk>', actividad.ActividadRetrieveAPIView.as_view()),  # terminado
     path('api/getEvaluador/<int:pk>', EvaluadorRetrieveAPIView.as_view()),  # terminado
     path('api/perfil/', MiPefilAPIView.as_view()),  # Terminado
-    path('api/actualizarImagenPerfil/', actualizarImagenPerfil),  # Terminado
+    path('api/actualizarImagenPerfil/', user.actualizarImagenPerfil),  # Terminado
     path('api/actualizarPassword/', actualizarPassword),  # terminado
     path('api/informacionCount/', ejercitario.informacionCount),  # terminado
     path('api/reporte/<int:idCompetencia>/<int:idParticipante>', participante.getReporte),  # terminado
+
+    # FabianUrls
+    path('api/listaEjercitario/', ejercitario.listaEjercitario),  # terminado
+    path('api/listarUsuarioRegistrado/', user.listarUsuarioRegistrado),  # terminado
+    #   path('api/bloqueoCuenta/<int:pk>', view.bloqueoUsuario),
 
     # certificados
     path('api/descargarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.descargar_certificado),
