@@ -14,6 +14,7 @@ from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLab
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
 from SimuladoresLaboralesApi.restful import comentario as comentario
 import usuario.views as user 
+
 from django.conf.urls import url
 from SimuladoresLaboralesApi.restful.login import Login
 
@@ -150,6 +151,6 @@ urlpatterns = [
 # FabianUrls
     path('api/listaEjercitario/', ejercitario.listaEjercitario),#terminado
     path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),#terminado
-#   path('api/bloqueoCuenta/<int:pk>', view.bloqueoUsuario),
+    path('api/bloqueoCuenta/<int:pk>', user.bloqueoUsuario),
 
 ]

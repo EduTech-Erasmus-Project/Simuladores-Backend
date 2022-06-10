@@ -83,3 +83,5 @@ def bloqueoEvaluador(request,pk=None):
             usuario_serilizer = UsuarioSerializer(usuario)
             return Response(usuario_serilizer.data, status=status.HTTP_200_OK)
 
+
+
