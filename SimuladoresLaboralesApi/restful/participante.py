@@ -188,6 +188,7 @@ def obtenerInformacionAsignacionesParticipante(request, correo, correoResponsabl
 
         return JsonResponse({"asignaciones": listadoInformacionAsignaciones}, status=status.HTTP_200_OK)
     except:
+
         return Response({'asignaciones': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 '''
