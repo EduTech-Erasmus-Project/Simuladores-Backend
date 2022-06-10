@@ -7,20 +7,19 @@ from adminApi.serializers import EvaluadorSerializer
 from usuario.models import Evaluador, Usuario
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView, ListAPIView
-# Create your views here.
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from pathlib import Path
 
 from SimuladoresLaboralesApi.models import DiscapacidadParticipante
 from SimuladoresLaboralesApi.serializers import UsuarioSerializer, EvaluadorSerializer, PerfilSerializers, \
     ActualizarPerfilSerializers
 from usuario.models import Usuario, Evaluador, Participante
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class EvaluadorRetrieveAPIView(RetrieveAPIView):
@@ -54,10 +53,14 @@ class MiPefilAPIView(APIView):
                 setattr(userUpdate, key, value)
             userUpdate.save()
 
-            if user.tipoUser == "participante" and len(discapacidades) > 0:
+            if user.tipoUser == "participante":
+                participante = Participante.objects.get(usuario_id=user.id)
+                DiscapacidadParticipante.objects.filter(participante_id=participante.id).delete()
                 for discapacidad in discapacidades:
-                    participante = Participante.objects.get(usuario_id=user.id)
-                    updated_values = {'gradoDeDiscapacidad': discapacidad["grado"], "discapacidad_id": discapacidad["id"], "participante_id": participante.id}
+                    obj = DiscapacidadParticipante(gradoDeDiscapacidad=discapacidad["grado"],
+                                                   participante_id=participante.id, discapacidad_id=discapacidad["id"])
+                    obj.save()
+                    '''
                     try:
                         obj = DiscapacidadParticipante.objects.get(gradoDeDiscapacidad=discapacidad["grado"], participante_id=participante.id, discapacidad_id=discapacidad["id"])
                         for key, value in updated_values.items():
@@ -66,6 +69,7 @@ class MiPefilAPIView(APIView):
                     except DiscapacidadParticipante.DoesNotExist:
                         obj = DiscapacidadParticipante(gradoDeDiscapacidad=discapacidad["grado"], participante_id=participante.id, discapacidad_id=discapacidad["id"])
                         obj.save()
+                    '''
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -84,10 +88,9 @@ def actualizarPassword(request):
         return Response({"estaus": "error", "code": "old_password_no_valid"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def listarUsuarioRegistrado (request):
+def listarUsuarioRegistrado(request):
     if request.method == 'GET':
         usuario = Usuario.objects.all().filter(tipoUser='participante')
         usuario_serializer =UsuarioSerializer(usuario,many =True)
@@ -153,3 +156,20 @@ def bloqueoUsuario(request,pk=None):
 #             "code":"invalid_api_key"
 #         },
 #         status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['PUT'])
+def actualizarImagenPerfil(request):
+    user = request.user
+    img = request.FILES["file"]
+    try:
+        if user.img is not None:
+            user.img.delete(save=False)
+
+        user.img = img
+        user.save()
+        serializer = UsuarioSerializer(user)
+        return Response({"status": "ok", "code": "ok", "user": serializer.data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({"status": "error", "code": "error_on_upload"}, status=status.HTTP_400_BAD_REQUEST)
