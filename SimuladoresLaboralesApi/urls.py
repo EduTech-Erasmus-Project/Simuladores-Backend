@@ -8,6 +8,9 @@ from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLaboral
 
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
+from SimuladoresLaboralesApi.restful import comentario as comentario
+import usuario.views as user 
+
 import usuario.views as user
 import adminApi.views as view
 from django.conf.urls import url
@@ -135,16 +138,14 @@ urlpatterns = [
     path('api/informacionCount/', ejercitario.informacionCount),  # terminado
     path('api/reporte/<int:idCompetencia>/<int:idParticipante>', participante.getReporte),  # terminado
 
-    # FabianUrls
-    path('api/listaEjercitario/', ejercitario.listaEjercitario),  # terminado
-    path('api/listarUsuarioRegistrado/', user.listarUsuarioRegistrado),  # terminado
-    #   path('api/bloqueoCuenta/<int:pk>', view.bloqueoUsuario),
+# FabianUrls
+    path('api/listaEjercitario/', ejercitario.listaEjercitario),#terminado
+    path('api/listarUsuarioRegistrado/',user.listarUsuarioRegistrado),#terminado
+    path('api/bloqueoCuenta/<int:pk>', user.bloqueoUsuario),
 
     # certificados
     path('api/descargarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.descargar_certificado),
     # path('api/enviarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.descargar_certificado),
 
-    # FabianUrls
-    path('api/listaEjercitario/', ejercitario.listaEjercitario),
-    path('api/listarUsuarioRegistrado/', user.listarUsuarioRegistrado),
+ 
 ]
