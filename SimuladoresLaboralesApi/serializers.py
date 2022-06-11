@@ -359,7 +359,7 @@ class ActividadSerialize(serializers.ModelSerializer):
 class DiscapacidadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discapacidad
-        fields = ('id', 'tipoDiscapacidad')
+        fields = '__all__'
 
 class DiscapacidadParticipanteSerializer(serializers.ModelSerializer):
     discapacidad = DiscapacidadSerializer()
