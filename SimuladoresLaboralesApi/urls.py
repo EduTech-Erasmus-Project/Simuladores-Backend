@@ -81,6 +81,7 @@ urlpatterns = [
     path('api/registroCompetencia/', ejercitario.registroCompetencia),  # terminado
     path('api/discapacidadListas/', discapacidadParticipante.getDiscapacidad),  # terminado 
     path('api/regisDiscapacidad/', discapacidadParticipante.regiDiscapacidad),  # terminado 
+    path('api/editarDiscapacidad/<int:pk>', discapacidadParticipante.editarDiscapacidad),  # terminado 
     path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador),
 
     # path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
