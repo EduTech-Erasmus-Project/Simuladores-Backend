@@ -239,7 +239,7 @@ class CompetenciaSerializer(serializers.ModelSerializer):
 class CompetenciaTotal(serializers.ModelSerializer):
     class Meta:
         model = Competencia
-        fields = ('id', 'titulo', 'descripcion')
+        fields = '__all__'
 
 
 class EjercitarioCompetenciaSerializer(serializers.ModelSerializer):
@@ -291,7 +291,7 @@ class RegistroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ("email", "nombre", "apellido", "password", "fechaNacimiento", "genero", "role")
+        fields = ("email", "nombre", "apellido", "password", "fechaNacimiento", "genero", "role", "institucion")
 
     def create(self, validated_data):
         if validated_data["role"] == 'user':
@@ -490,7 +490,7 @@ class PerfilSerializers(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
-            'nivelDeFormacion', 'codigo', 'tipoUser',
+            'nivelDeFormacion', 'codigo', 'tipoUser', 'institucion',
         )
 
 
@@ -501,7 +501,7 @@ class ActualizarPerfilSerializers(serializers.ModelSerializer):
         fields = (
             'nombre', 'apellido', 'telefono', 'pais', 'ciudad', 'direccion', 'fechaNacimiento'
             , 'carreraUniversitaria', 'genero', 'numeroDeHijos', 'estadoCivil', 'etnia', 'estudiosPrevios',
-            'nivelDeFormacion',
+            'nivelDeFormacion','institucion',
         )
 
 

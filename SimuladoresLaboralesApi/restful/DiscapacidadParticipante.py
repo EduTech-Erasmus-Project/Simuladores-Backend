@@ -90,3 +90,16 @@ def editarDiscapacidad(request,pk=None):
     discapacidad = Discapacidad.objects.get(id=pk)
     discapacidad_serializer = DiscapacidadSerializer(discapacidad)
     return Response(discapacidad_serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def guardarEditarDiscapacidad(request):
+    pk = request.data.get('id')
+    discapacidad = Discapacidad.objects.get(id=pk)
+    discapacidad_serializer = DiscapacidadSerializer(discapacidad, data=request.data)
+    if discapacidad_serializer.is_valid():
+        discapacidad_serializer.save()
+        return Response(discapacidad_serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(discapacidad_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
