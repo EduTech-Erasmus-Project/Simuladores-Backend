@@ -162,6 +162,18 @@ class nuevaPreguntaUnitySerializerObjects(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PreguntaTotal(serializers.ModelSerializer):
+    class Meta:
+        model = Pregunta
+        fields = ('id', 'contenido', 'respuestaCorrecta', 'numeroPregunta', 'preguntaDelEjercitario')
+
+class PreguntaEjercitarioSerializer(serializers.ModelSerializer):
+    pregunta = PreguntaTotal()
+
+    class Meta:
+        model = Pregunta
+        fields = '__all__'
+
 class EjercitarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ejercitario
@@ -359,7 +371,7 @@ class ActividadSerialize(serializers.ModelSerializer):
 class DiscapacidadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discapacidad
-        fields = ('id', 'tipoDiscapacidad')
+        fields = '__all__'
 
 class DiscapacidadParticipanteSerializer(serializers.ModelSerializer):
     discapacidad = DiscapacidadSerializer()

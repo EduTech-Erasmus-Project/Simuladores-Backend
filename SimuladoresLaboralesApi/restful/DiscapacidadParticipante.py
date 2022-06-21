@@ -75,7 +75,7 @@ class discapacidadTotal (ListAPIView):
 
 
 @api_view(['POST'])
-@permission_classes((IsAdmin))
+@permission_classes((IsAdmin,))
 def regiDiscapacidad(request):
     discapacidad_serializer = DiscapacidadSerializer(data=request.data)
     if discapacidad_serializer.is_valid():
