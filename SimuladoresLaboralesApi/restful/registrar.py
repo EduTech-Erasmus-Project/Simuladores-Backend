@@ -43,7 +43,7 @@ def verificacionPassword(password):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarParticipante(request):
-
+    print("DATOS OBTENIDOS   =====>    ", request.data)
     email = request.data.get('email')
     password = request.data.get('password')
     if not validacionCorreo(email=email):
@@ -56,6 +56,7 @@ def registrarParticipante(request):
         'fechaNacimiento': request.data.get('fechaNacimiento'),
         'genero': request.data.get('genero'),
         'role': request.data.get('role'),
+        'institucion': request.data.get('institucion')
     }
     if request.data.get('role') == 'user':
         try:
