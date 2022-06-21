@@ -174,19 +174,15 @@ urlpatterns = [
 
     # FabianUrls
     path('api/listaEjercitario/', ejercitario.listaEjercitario),  # terminado
-    path('api/listarUsuarioRegistrado/',
-         user.listarUsuarioRegistrado),  # terminado
+    path('api/listarUsuarioRegistrado/', user.listarUsuarioRegistrado),  # terminado
     path('api/bloqueoCuenta/<int:pk>', user.bloqueoUsuario),  # Termindo
     path('api/editarEjercitario/', ejercitario.editarEjercitario),  # Terminado
-    path('api/recuperarEjercitario/<int:pk>',
-         ejercitario.recuperarEjercitario),  # Terminado
+    path('api/recuperarEjercitario/<int:pk>', ejercitario.recuperarEjercitario),  # Terminado
     path('api/registroEjercitario/', ejercitario.registroEjercitario),  # Terminado
     path('api/registroPregunta/', pregunta.registroPregunta),  # Terminado
     path('api/editarPregunta/', pregunta.editarPregunta),
-    path('api/listaPreguntaEjercitario/<int:pk>',
-         pregunta.listaPreguntaEjercitario),
-    path('api/recuperaPreguntaEjercitario/<int:pk>',
-         pregunta.recuperarPreguntaEjercitario),
+    path('api/listaPreguntaEjercitario/<int:pk>', pregunta.listaPreguntaEjercitario),
+    path('api/recuperaPreguntaEjercitario/<int:pk>', pregunta.recuperarPreguntaEjercitario),
 
 
     # certificados
