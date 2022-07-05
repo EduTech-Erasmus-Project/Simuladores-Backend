@@ -167,6 +167,7 @@ class PreguntaTotal(serializers.ModelSerializer):
         model = Pregunta
         fields = ('id', 'contenido', 'respuestaCorrecta', 'numeroPregunta', 'preguntaDelEjercitario')
 
+
 class PreguntaEjercitarioSerializer(serializers.ModelSerializer):
     pregunta = PreguntaTotal()
 
@@ -253,6 +254,10 @@ class CompetenciaTotal(serializers.ModelSerializer):
         model = Competencia
         fields = ('id', 'titulo', 'descripcion')
 
+class RubricaTotal(serializers.ModelSerializer):
+    class Meta:
+        model = Rubrica
+        fields = ('id','calificacion', 'indicador', 'ejercitario_id')
 
 class EjercitarioCompetenciaSerializer(serializers.ModelSerializer):
     competencia = CompetenciaTotal()

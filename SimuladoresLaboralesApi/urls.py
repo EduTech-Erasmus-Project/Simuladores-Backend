@@ -8,7 +8,7 @@ from SimuladoresLaboralesApi.restful import participante as participante
 from SimuladoresLaboralesApi.restful import evaluador as evaluador
 from SimuladoresLaboralesApi.restful import experienciaLaboral as experienciaLaboral
 from SimuladoresLaboralesApi.restful import pregunta as pregunta
-
+from SimuladoresLaboralesApi.restful import rubrica as rubrica
 from SimuladoresLaboralesApi.restful import DiscapacidadParticipante as discapacidadParticipante
 from SimuladoresLaboralesApi.restful import comentario as comentario
 import usuario.views as user
@@ -180,10 +180,18 @@ urlpatterns = [
     path('api/recuperarEjercitario/<int:pk>', ejercitario.recuperarEjercitario),  # Terminado
     path('api/registroEjercitario/', ejercitario.registroEjercitario),  # Terminado
     path('api/registroPregunta/', pregunta.registroPregunta),  # Terminado
-    path('api/editarPregunta/', pregunta.editarPregunta),
-    path('api/listaPreguntaEjercitario/<int:pk>', pregunta.listaPreguntaEjercitario),
-    path('api/recuperaPreguntaEjercitario/<int:pk>', pregunta.recuperarPreguntaEjercitario),
-
+    path('api/editarPregunta/', pregunta.editarPregunta),# Terminado
+    path('api/listaPreguntaEjercitario/<int:pk>', pregunta.listaPreguntaEjercitario),# Terminado
+    path('api/recuperaPreguntaEjercitario/<int:pk>', pregunta.recuperarPreguntaEjercitario),# Terminado
+    
+    path('api/registroRubrica/', rubrica.registroRubrica),# Terminado
+    path('api/editarRubrica/', rubrica.editarRubrica),# Terminado
+    path('api/recuperarRubrica/<int:pk>', rubrica.recuperarRubrica),# Terminado
+    path('api/listaRubrica/<int:pk>', rubrica.listaRubrica),# Terminado
+    
+    
+    
+         
 
     # certificados
     path('api/descargarCertificado/<int:idCompetencia>/<int:idParticipante>',

@@ -27,7 +27,8 @@ def editarPregunta(request):
     pregunta.contenido = request.data.get('contenido')
     pregunta.respuestaCorrecta = request.data.get('respuestaCorrecta')
     pregunta.numeroPregunta = request.data.get('numeroPregunta')
-    pregunta.preguntaDelEjercitario_id = request.data.get('preguntaDelEjercitario')
+    pregunta.preguntaDelEjercitario_id = request.data.get(
+        'preguntaDelEjercitario')
 
     try:
         pregunta.save()
@@ -44,6 +45,7 @@ def listaPreguntaEjercitario(request, pk=None):
         pregunta_serializar = PreguntaTotal(pregunta, many=True)
         return Response(pregunta_serializar.data)
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def recuperarPreguntaEjercitario(request, pk=None):
@@ -57,13 +59,19 @@ def recuperarPreguntaEjercitario(request, pk=None):
 @permission_classes((permissions.AllowAny,))
 def registroPregunta(request):
     print(request.data)
-    numeroPregunta = request.data.get('numeroPregunta')
+    
     contenido = request.data.get('contenido')
     respuestaCorrecta = request.data.get('respuestaCorrecta')
     preguntaDelEjercitario = request.data.get('id')
 
     pregunta = Pregunta()
-    pregunta.numeroPregunta = numeroPregunta
+    count = Pregunta.objects.all().count()
+    print(f'CONSULTA {count}')
+    if count != 0:
+        obj = Pregunta.objects.latest('id')
+        pregunta.numeroPregunta = obj.numeroPregunta + 1
+    else:
+        pregunta.numeroPregunta = 1
     pregunta.contenido = contenido
     pregunta.respuestaCorrecta = respuestaCorrecta
     pregunta. preguntaDelEjercitario_id = preguntaDelEjercitario

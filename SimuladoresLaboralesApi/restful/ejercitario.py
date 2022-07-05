@@ -1,4 +1,6 @@
 from distutils.command.upload import upload
+import os
+import uuid
 from turtle import title
 from unicodedata import name
 from urllib import response
@@ -17,6 +19,7 @@ from SimuladoresLaboralesApi.views import EjercitarioViewSet
 
 # from ..mixins import ValidateToken
 from rest_framework.generics import RetrieveAPIView, ListAPIView
+from unityREST.settings import DEBUG
 
 from usuario.models import Participante
 from usuario.views import BASE_DIR
@@ -85,6 +88,8 @@ def obtenerAsignacionDeEjercitarioDeUnParticipante(request):
 '''
 
 # verificar metodo
+
+
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -97,12 +102,14 @@ def obtenerListaDeEscenarios(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def listaEjercitario (request):
+def listaEjercitario(request):
     if request.method == 'GET':
         ejercitario = Ejercitario.objects.all()
-        ejercitario_serializar = EjercitarioCompetenciaSerializer(ejercitario, many =True)
+        ejercitario_serializar = EjercitarioCompetenciaSerializer(
+            ejercitario, many=True)
         return Response(ejercitario_serializar.data)
 
 
@@ -122,6 +129,7 @@ class CompetenciasRetrieveAPIView(ListAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
+
 class CompetenciaT (ListAPIView):
     serializer_class = CompetenciaTotal
     queryset = Competencia.objects.all()
@@ -131,64 +139,79 @@ class CompetenciaRetrieveAPIView(RetrieveAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
+
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def editarEjercitario(request): 
+def editarEjercitario(request):
     if (request.method == 'PUT'):
         id = request.data.get('id')
         print(request.data)
 
     try:
         ejercitario = Ejercitario.objects.get(id=id)
-         
+
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
 
     ejercitario.nombreDeEjercitario = request.data.get('nombreDeEjercitario')
     ejercitario.categoria = request.data.get('categoria')
     ejercitario.tipoDeEjercitario = request.data.get('tipoDeEjercitario')
-    ejercitario.duracion = request.data.get('duracion')
+    ejercitario.duracion = int(request.data.get('duracion'))
     ejercitario.sector = request.data.get('sector')
     ejercitario.nivel = request.data.get('nivel')
     ejercitario.competencia_id = request.data.get('competencia')
-    ejercitario.instruccionPrincipalEjercitario = request.data.get('instruccionPrincipalEjercitario')
-    ejercitario.instruccionesParticipantes = request.data.get('instruccionesParticipantes')
+    ejercitario.urlEjercitario = request.data.get('urlEjercitario') 
+    ejercitario.instruccionPrincipalEjercitario = request.data.get(
+        'instruccionPrincipalEjercitario')
+    ejercitario.instruccionesParticipantes = request.data.get(
+        'instruccionesParticipantes')
     ejercitario.variaciones = request.data.get('variaciones')
     try:
         ejercitario.save()
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
     except:
-        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST) 
-
+        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registroEjercitario(request):
-    
+
     file = request.FILES.get('file')
     name = str(file.name)
+    filename = name.split('.')[0]
     nombreDeEjercitario = request.data.get('nombreDeEjercitario')
     categoria = request.data.get('categoria')
     tipoDeEjercitario = request.data.get('tipoDeEjercitario')
-    duracion = request.data.get('duracion')
+    duracion = int(request.data.get('duracion'))
     sector = request.data.get('sector')
     nivel = request.data.get('nivel')
     competencia = request.data.get('competencia')
-    instruccionPrincipalEjercitario = request.data.get('instruccionPrincipalEjercitario')
+    instruccionPrincipalEjercitario = request.data.get(
+        'instruccionPrincipalEjercitario')
     instruccionesParticipantes = request.data.get('instruccionesParticipantes')
     variaciones = request.data.get('variaciones')
-   
+
     fss = FileSystemStorage()
-    print(BASE_DIR)
+    print(BASE_DIR, request._current_scheme_host)
     file = fss.save(BASE_DIR/'media'/name, file)
-    
+
     with ZipFile(BASE_DIR/'media'/name) as zip:
-        zip.extractall(BASE_DIR/'media')
+        auxname = zip.filelist[0].filename.split('/')
+        filename = f'{hex(uuid.getnode())}'
+        zip.extractall(BASE_DIR/'media'/filename)
+    fss.delete(file)
+
+    preview_adapted = os.path.join(
+        request._current_scheme_host, f'media/{filename}/web', 'index.html').replace("\\", "/")
+
+    if not DEBUG:
+        preview_adapted = preview_adapted.replace("http://", "https://")
 
     ejercitario = Ejercitario()
     ejercitario.categoria = categoria
+    ejercitario.urlEjercitario = preview_adapted
     ejercitario.nombreDeEjercitario = nombreDeEjercitario
     ejercitario.tipoDeEjercitario = tipoDeEjercitario
     ejercitario.duracion = duracion
@@ -198,30 +221,30 @@ def registroEjercitario(request):
     ejercitario.instruccionesParticipantes = instruccionesParticipantes
     ejercitario.instruccionPrincipalEjercitario = instruccionPrincipalEjercitario
     ejercitario.variaciones = variaciones
-    
+
     try:
         ejercitario.save()
         return Response({'registro': 'ok'}, status=status.HTTP_200_OK)
     except:
-        return Response({'registro': 'error'}, status=status.HTTP_400_BAD_REQUEST) 
-    
-    
+        return Response({'registro': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
        # fss = FileSystemStorage()
     # file = fss.save(BASE_DIR/'files'/nombreDeEjercitario, file)
 
     # with ZipFile(BASE_DIR/'files'/nombreDeEjercitario)as zip:
     #     zip.extractall(BASE_DIR/'files')
-        
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def recuperarEjercitario(request,pk=None):
+def recuperarEjercitario(request, pk=None):
     if request.method == 'GET':
-        ejercitario = Ejercitario.objects.get(id=pk)          
-        ejercitarioCompetencia_serializer = EjercitarioCompetenciaSerializer(ejercitario)
+        ejercitario = Ejercitario.objects.get(id=pk)
+        ejercitarioCompetencia_serializer = EjercitarioCompetenciaSerializer(
+            ejercitario)
         return Response(ejercitarioCompetencia_serializer.data, status=status.HTTP_200_OK)
-       
-            
+
+
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registroCompetencia(request):
@@ -229,9 +252,7 @@ def registroCompetencia(request):
     if competencia_serializer.is_valid():
         competencia_serializer.save()
         return Response(competencia_serializer.data)
-    return Response(competencia_serializer.errors)  
-
-
+    return Response(competencia_serializer.errors)
 
 
 @api_view(['GET'])
@@ -258,6 +279,7 @@ def getEscenarioPorNumero(request, numeroDeEjercitario):
 
     escenario_serializer = EjercitarioSerializerObjects(escenario)
     return Response(escenario_serializer.data)
+
 
 '''
 @api_view(['POST'])
@@ -336,6 +358,7 @@ def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 '''
 
+
 @api_view(['GET'])
 @permission_classes((IsExpert,))
 def obtenerTipoGeneroPorEvaluador(request):
@@ -363,7 +386,8 @@ def obtenerDiscapacidadesPorEvaluador(request):
     for dicapacidad in discapacidades:
         ListaParticipanteGenero.append(str(dicapacidad.tipoDiscapacidad))
     counter = Counter(ListaParticipanteGenero)
-    listaDiscapacidadEvaludor = [{key: value} for key, value in counter.items()]
+    listaDiscapacidadEvaludor = [{key: value}
+                                 for key, value in counter.items()]
     return JsonResponse({"participanteDiscapacidad": listaDiscapacidadEvaludor}, status=status.HTTP_200_OK)
 
 
@@ -376,8 +400,10 @@ def obtenerParticipantesEjercitarioPorEvaluador(request):
     # ejercitarios = Ejercitario.objects.filter(competencia__asignacion_competencia__evaluador__usuario_id=idEvaluador,
     # competencia__asignacion_competencia__participante__aceptacionResponsable="aprobado")
 
-    actividades = Actividad.objects.filter(participante__evaluador__usuario_id=idEvaluador)
-    competencia = Competencia.objects.filter(competencia_ejercitario__actividad_ejercitario__in=actividades)
+    actividades = Actividad.objects.filter(
+        participante__evaluador__usuario_id=idEvaluador)
+    competencia = Competencia.objects.filter(
+        competencia_ejercitario__actividad_ejercitario__in=actividades)
 
     # print("ejercitario", ejercitarios)
     ListaParticipanteCompetencia = []
@@ -407,6 +433,7 @@ def obtenerDiscapacidad(request):
     except Exception as e:
         print("error", e)
         return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 '''
 @api_view(['POST'])
@@ -567,6 +594,8 @@ def getEstudiantesEjercitarioResponsable(request, ejercitario):
 '''
 
 # metodo ligado con getEstudiantesEjercitarioResponsable
+
+
 @api_view(['GET'])
 # @permission_classes((permissions.AllowAny,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
@@ -588,7 +617,8 @@ def getNotasEstudianteEjercitarioResponsable(request, ejercitario, idParticipant
         contnumeroActi = 0
         for actiPart in actividadParticipante:
             contCalificaciones = contCalificaciones + actiPart.calificacionActividad
-            contCalificacionesTiempo = contCalificacionesTiempo + actiPart.tiempoTotalResolucionEjercitario
+            contCalificacionesTiempo = contCalificacionesTiempo + \
+                actiPart.tiempoTotalResolucionEjercitario
             contnumeroActi = contnumeroActi + 1
 
         if (contnumeroActi > 0):
@@ -639,9 +669,12 @@ class ParticipantesEjercitario(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        ejercitarios = Ejercitario.objects.filter(competencia_id=self.kwargs['pk'])
-        users = Usuario.objects.filter(usuario_participante__evaluador__usuario_id=user.id)
-        users = users.filter(usuario_participante__actividad_participante__ejercitario_id__in=ejercitarios)
+        ejercitarios = Ejercitario.objects.filter(
+            competencia_id=self.kwargs['pk'])
+        users = Usuario.objects.filter(
+            usuario_participante__evaluador__usuario_id=user.id)
+        users = users.filter(
+            usuario_participante__actividad_participante__ejercitario_id__in=ejercitarios)
         data = []
         for user in users:
             if user not in data:
@@ -667,16 +700,19 @@ class ParticipantesRechazadosListApiView(ListAPIView):
         user = self.request.user
         return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="rechazado")
 
+
 class ParticipantesListApiView(ListAPIView):
     serializer_class = ParticipanteSerializerList
     permission_classes = (IsExpert,)
 
     def get_queryset(self):
         user = self.request.user
-        data = Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="aprobado")
+        data = Participante.objects.filter(
+            evaluador__usuario_id=user.id, aceptacionResponsable="aprobado")
         print("users", data)
 
         return data
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
