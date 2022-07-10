@@ -179,10 +179,12 @@ urlpatterns = [
     path('api/editarEjercitario/', ejercitario.editarEjercitario),  # Terminado
     path('api/recuperarEjercitario/<int:pk>', ejercitario.recuperarEjercitario),  # Terminado
     path('api/registroEjercitario/', ejercitario.registroEjercitario),  # Terminado
+    
     path('api/registroPregunta/', pregunta.registroPregunta),  # Terminado
     path('api/editarPregunta/', pregunta.editarPregunta),# Terminado
     path('api/listaPreguntaEjercitario/<int:pk>', pregunta.listaPreguntaEjercitario),# Terminado
     path('api/recuperaPreguntaEjercitario/<int:pk>', pregunta.recuperarPreguntaEjercitario),# Terminado
+    path('api/eliminarPregunta/<int:pk>', pregunta.eliminarPregunta),
     
     path('api/registroRubrica/', rubrica.registroRubrica),# Terminado
     path('api/editarRubrica/', rubrica.editarRubrica),# Terminado

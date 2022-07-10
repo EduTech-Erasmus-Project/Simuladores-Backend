@@ -54,6 +54,17 @@ def recuperarPreguntaEjercitario(request, pk=None):
         pregunta_serializar = PreguntaTotal(pregunta)
         return Response(pregunta_serializar.data)
 
+@api_view(['DELETE'])
+@permission_classes((permissions.AllowAny,))
+def eliminarPregunta(request, pk=None):
+    if request.method == 'DELETE':
+        print(f'-------->{pk}')
+        pregunta = Pregunta.objects.filter(id=pk)
+        print(pregunta)
+        pregunta.delete()
+        
+        pregunta_serializar = PreguntaTotal(pregunta)
+        return Response(pregunta_serializar.data)
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))

@@ -88,7 +88,8 @@ class Asignacion(models.Model):
 
 
 class Pregunta(models.Model):
-    contenido = models.CharField(max_length=300, blank=False, null=False)
+    
+    contenido:any = models.CharField(max_length=300, blank=False, null=False)
     respuestaCorrecta = models.CharField(max_length=100, blank=False, null=False)
     numeroPregunta = models.PositiveIntegerField(default=0, blank=False, null=False)
     preguntaDelEjercitario = models.ForeignKey(Ejercitario, on_delete=models.CASCADE, null=True, blank=True,
