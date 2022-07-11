@@ -94,11 +94,21 @@ urlpatterns = [
          view.listarEvaluladoresRechazado),  # Terminado
     path('api/aprobarEvaluador/', view.aprobarEvaluador),  # terminado
     path('api/registroCompetencia/', ejercitario.registroCompetencia),  # terminado
+
     path('api/discapacidadListas/',
          discapacidadParticipante.getDiscapacidad),  # terminado
     path('api/regisDiscapacidad/',
          discapacidadParticipante.regiDiscapacidad),  # terminado
     path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador),
+
+    path('api/discapacidadListas/', discapacidadParticipante.getDiscapacidad),  # terminado 
+    path('api/regisDiscapacidad/', discapacidadParticipante.regiDiscapacidad),  # terminado 
+    path('api/editarDiscapacidad/<int:pk>', discapacidadParticipante.editarDiscapacidad),  # terminado 
+    path('api/guardarEditarCompetencia/', ejercitario.guardarECompetencia),  # terminado 
+    path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador), #terminado
+    path('api/editarCompetencia/<int:pk>', ejercitario.editarCompetencia),  # terminado
+    path('api/guardarEditarDiscapacidad/', discapacidadParticipante.guardarEditarDiscapacidad),  # terminado 
+
 
     # path('api/getParticipanteDeUnResponsable/<str:correo>/<str:correoResponsable>',
     # participante.getParticipanteDeUnResponsable),

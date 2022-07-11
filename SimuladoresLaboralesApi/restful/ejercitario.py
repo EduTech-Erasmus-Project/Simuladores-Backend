@@ -1,6 +1,8 @@
+
 from distutils.command.upload import upload
 import os
 import uuid
+from http.client import error
 from turtle import title
 from unicodedata import name
 from urllib import response
@@ -138,6 +140,34 @@ class CompetenciaT (ListAPIView):
 class CompetenciaRetrieveAPIView(RetrieveAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def editarCompetencia(request,pk=None):
+    competencia = Competencia.objects.get(id=pk)
+    competencia_serializer = CompetenciaTotal(competencia)
+    return Response(competencia_serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@permission_classes((permissions.AllowAny,))
+def guardarECompetencia(request):
+    if (request.method == 'PUT'):
+        pk = request.data.get('id')
+
+    try:
+        competencia = Competencia.objects.get(id=pk)
+    except:
+        return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
+    
+    competencia.titulo = request.data.get('titulo')
+    competencia.descripcion = request.data.get('descripcion')
+
+    try:
+        competencia.save()
+        return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
+    except:
+        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
