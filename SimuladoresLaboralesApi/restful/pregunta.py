@@ -60,10 +60,17 @@ def eliminarPregunta(request, pk=None):
     if request.method == 'DELETE':
         print(f'-------->{pk}')
         pregunta = Pregunta.objects.filter(id=pk)
-        print(pregunta)
         pregunta.delete()
+        preguntas = Pregunta.objects.all()
+        num = 1
+        for p in preguntas:
+            p.numeroPregunta = num
+            num += 1
+            p.save()
+        print(preguntas)
+        print(pregunta)
         
-        pregunta_serializar = PreguntaTotal(pregunta)
+        pregunta_serializar = PreguntaTotal(pregunta, many=True)
         return Response(pregunta_serializar.data)
 
 @api_view(['POST'])

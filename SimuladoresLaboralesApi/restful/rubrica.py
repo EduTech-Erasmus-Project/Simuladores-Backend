@@ -54,6 +54,7 @@ def editarRubrica(request):
     except:
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def recuperarRubrica(request, pk=None):
@@ -62,10 +63,23 @@ def recuperarRubrica(request, pk=None):
         rubrica_serializar = RubricaTotal(rubrica)
         return Response(rubrica_serializar.data)
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def listaRubrica(request, pk=None):
     if request.method == 'GET':
         rubrica = Rubrica.objects.filter(ejercitario_id=pk)
         rubrica_serializar = RubricaTotal(rubrica, many=True)
+        return Response(rubrica_serializar.data)
+
+@api_view(['DELETE'])
+@permission_classes((permissions.AllowAny,))
+def eliminarRubrica(request, pk=None):
+    if request.method == 'DELETE':
+        print(f'-------->{pk}')
+        rubrica = Rubrica.objects.filter(id=pk)
+        print(rubrica)
+        rubrica.delete()
+
+        rubrica_serializar = RubricaTotal(rubrica)
         return Response(rubrica_serializar.data)

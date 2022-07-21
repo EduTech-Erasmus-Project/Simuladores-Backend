@@ -164,9 +164,9 @@ class nuevaPreguntaUnitySerializerObjects(serializers.ModelSerializer):
 
 class PreguntaTotal(serializers.ModelSerializer):
     class Meta:
-        model = Pregunta
+        
         fields = ('id', 'contenido', 'respuestaCorrecta', 'numeroPregunta', 'preguntaDelEjercitario')
-
+        model = Pregunta
 
 class PreguntaEjercitarioSerializer(serializers.ModelSerializer):
     pregunta = PreguntaTotal()

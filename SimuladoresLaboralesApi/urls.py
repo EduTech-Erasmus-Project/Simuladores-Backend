@@ -200,6 +200,7 @@ urlpatterns = [
     path('api/editarRubrica/', rubrica.editarRubrica),# Terminado
     path('api/recuperarRubrica/<int:pk>', rubrica.recuperarRubrica),# Terminado
     path('api/listaRubrica/<int:pk>', rubrica.listaRubrica),# Terminado
+     path('api/eliminarRubrica/<int:pk>', rubrica.eliminarRubrica), #Terminado
     
     
     
