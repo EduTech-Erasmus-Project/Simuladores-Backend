@@ -1,3 +1,4 @@
+from ..mixins import IsAdmin
 from ..models import *
 from ..serializers import *
 from rest_framework.response import Response
@@ -11,43 +12,44 @@ import re
 
 
 @api_view(['PUT'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 # @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def editarPregunta(request):
-    if (request.method == 'PUT'):
-        id = request.data.get('id')
-        print(request.data)
+
+    id = request.data.get('id')
+
 
     try:
         pregunta = Pregunta.objects.get(id=id)
 
+        print(pregunta)
+
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
 
-    pregunta.contenido = request.data.get('contenido')
-    pregunta.respuestaCorrecta = request.data.get('respuestaCorrecta')
-    pregunta.numeroPregunta = request.data.get('numeroPregunta')
-    pregunta.preguntaDelEjercitario_id = request.data.get(
-        'preguntaDelEjercitario')
-
     try:
+        pregunta.contenido = request.data.get('contenido')
+        pregunta.respuestaCorrecta = request.data.get('respuestaCorrecta')
+        pregunta.numeroPregunta = request.data.get('numeroPregunta')
+        pregunta.preguntaDelEjercitario_id = request.data.get('preguntaDelEjercitario')
         pregunta.save()
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
-    except:
+    except Exception as e:
+        print(e)
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 def listaPreguntaEjercitario(request, pk=None):
     if request.method == 'GET':
-        pregunta = Pregunta.objects.filter(preguntaDelEjercitario_id=pk)
+        pregunta = Pregunta.objects.filter(preguntaDelEjercitario_id=pk).order_by('id')
         pregunta_serializar = PreguntaTotal(pregunta, many=True)
         return Response(pregunta_serializar.data)
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 def recuperarPreguntaEjercitario(request, pk=None):
     if request.method == 'GET':
         pregunta = Pregunta.objects.get(id=pk)
@@ -55,47 +57,44 @@ def recuperarPreguntaEjercitario(request, pk=None):
         return Response(pregunta_serializar.data)
 
 @api_view(['DELETE'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 def eliminarPregunta(request, pk=None):
-    if request.method == 'DELETE':
-        print(f'-------->{pk}')
-        pregunta = Pregunta.objects.filter(id=pk)
+    try:
+        #print(f'-------->{pk}')
+        pregunta = Pregunta.objects.get(id=pk)
+        ejercitario = pregunta.preguntaDelEjercitario_id
         pregunta.delete()
-        preguntas = Pregunta.objects.all()
+        # pregunta.save()
+
+        preguntas = Pregunta.objects.filter(preguntaDelEjercitario_id=ejercitario).order_by('id')
+        print("data 0", preguntas[0].id)
+
         num = 1
         for p in preguntas:
+            print("prev numero", p.numeroPregunta)
             p.numeroPregunta = num
             num += 1
             p.save()
-        print(preguntas)
-        print(pregunta)
-        
-        pregunta_serializar = PreguntaTotal(pregunta, many=True)
-        return Response(pregunta_serializar.data)
+            print("current numero", p.numeroPregunta)
+
+
+        pregunta_serializar = PreguntaTotal(preguntas, many=True)
+        return Response(pregunta_serializar.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({"status": "error", "message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 def registroPregunta(request):
-    print(request.data)
-    
-    contenido = request.data.get('contenido')
-    respuestaCorrecta = request.data.get('respuestaCorrecta')
-    preguntaDelEjercitario = request.data.get('id')
-
-    pregunta = Pregunta()
-    count = Pregunta.objects.all().count()
-    print(f'CONSULTA {count}')
-    if count != 0:
-        obj = Pregunta.objects.latest('id')
-        pregunta.numeroPregunta = obj.numeroPregunta + 1
-    else:
-        pregunta.numeroPregunta = 1
-    pregunta.contenido = contenido
-    pregunta.respuestaCorrecta = respuestaCorrecta
-    pregunta. preguntaDelEjercitario_id = preguntaDelEjercitario
-
     try:
-        pregunta.save()
-        return Response({'registropregunta': 'ok'}, status=status.HTTP_200_OK)
-    except:
-        return Response({'registropregunta': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+        for pregunta in request.data.get("questions"):
+            #print(pregunta)
+            seriealizer = PreguntaSerializer(data=pregunta)
+            if seriealizer.is_valid():
+                seriealizer.save()
+        return Response({'registropregunta': 'ok', "data": request.data.get("questions")}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({'registropregunta': 'error', "message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)

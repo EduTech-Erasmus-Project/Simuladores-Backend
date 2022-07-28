@@ -31,7 +31,7 @@ class SesionSerializer(serializers.HyperlinkedModelSerializer):
 '''
 
 
-class EjercitarioSerializer(serializers.HyperlinkedModelSerializer):
+class EjercitarioUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ejercitario
         fields = '__all__'
@@ -43,12 +43,12 @@ class ActividadSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-''' 
-class PreguntaSerializer(serializers.HyperlinkedModelSerializer):
+
+class PreguntaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pregunta
         fields = '__all__'
-'''
+
 
 
 class ComentarioSerializerObjects(serializers.HyperlinkedModelSerializer):
@@ -260,7 +260,7 @@ class RubricaTotal(serializers.ModelSerializer):
         fields = ('id','calificacion', 'indicador', 'ejercitario_id')
 
 class EjercitarioCompetenciaSerializer(serializers.ModelSerializer):
-    competencia = CompetenciaTotal()
+    #competencia = CompetenciaTotal()
 
     class Meta:
         model = Ejercitario

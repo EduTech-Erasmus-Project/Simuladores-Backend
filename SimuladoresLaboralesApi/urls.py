@@ -99,7 +99,7 @@ urlpatterns = [
          discapacidadParticipante.getDiscapacidad),  # terminado
     path('api/regisDiscapacidad/',
          discapacidadParticipante.regiDiscapacidad),  # terminado
-    path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador),
+    #path('api/bloqueoCuenta/<int:pk>', view.bloqueoEvaluador),
 
     path('api/discapacidadListas/', discapacidadParticipante.getDiscapacidad),  # terminado 
     path('api/regisDiscapacidad/', discapacidadParticipante.regiDiscapacidad),  # terminado 
@@ -186,7 +186,7 @@ urlpatterns = [
     path('api/listaEjercitario/', ejercitario.listaEjercitario),  # terminado
     path('api/listarUsuarioRegistrado/', user.listarUsuarioRegistrado),  # terminado
     path('api/bloqueoCuenta/<int:pk>', user.bloqueoUsuario),  # Termindo
-    path('api/editarEjercitario/', ejercitario.editarEjercitario),  # Terminado
+    path('api/editarEjercitario/<int:pk>', ejercitario.UpdateEjercitario.as_view()),  # Terminado
     path('api/recuperarEjercitario/<int:pk>', ejercitario.recuperarEjercitario),  # Terminado
     path('api/registroEjercitario/', ejercitario.registroEjercitario),  # Terminado
     
@@ -209,7 +209,7 @@ urlpatterns = [
     # certificados
     path('api/descargarCertificado/<int:idCompetencia>/<int:idParticipante>',
          participante.descargar_certificado),
-    # path('api/enviarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.descargar_certificado),
+    path('api/enviarCertificado/<int:idCompetencia>/<int:idParticipante>', participante.enviar_certificado),
 
 
 ]

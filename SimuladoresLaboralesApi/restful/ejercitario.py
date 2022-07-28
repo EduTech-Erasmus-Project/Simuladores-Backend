@@ -1,4 +1,3 @@
-
 from distutils.command.upload import upload
 import os
 import uuid
@@ -10,14 +9,14 @@ from django.db.models import Q, Sum
 from zipfile import ZipFile
 from django.core.files.storage import FileSystemStorage
 
-#from firebase_admin import storage
+# from firebase_admin import storage
 
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.core.files.storage import FileSystemStorage
 from SimuladoresLaboralesApi.views import EjercitarioViewSet
 
-#from main.settings import BASE_DIR
+# from main.settings import BASE_DIR
 
 # from ..mixins import ValidateToken
 from rest_framework.generics import RetrieveAPIView, ListAPIView
@@ -28,13 +27,12 @@ from usuario.views import BASE_DIR
 from ..mixins import IsExpert
 from ..serializers import *
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import AccessToken
 from collections import Counter
-
 
 ''' 
 @api_view(['POST'])
@@ -89,6 +87,7 @@ def obtenerAsignacionDeEjercitarioDeUnParticipante(request):
     return JsonResponse({"asignaciones": list(asignaciones)})
 '''
 
+
 # verificar metodo
 
 
@@ -115,8 +114,6 @@ def listaEjercitario(request):
         return Response(ejercitario_serializar.data)
 
 
-
-
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def getTotalEjercitarios(request):
@@ -132,7 +129,7 @@ class CompetenciasRetrieveAPIView(ListAPIView):
     queryset = Competencia.objects.all()
 
 
-class CompetenciaT (ListAPIView):
+class CompetenciaT(ListAPIView):
     serializer_class = CompetenciaTotal
     queryset = Competencia.objects.all()
 
@@ -141,9 +138,10 @@ class CompetenciaRetrieveAPIView(RetrieveAPIView):
     serializer_class = CompetenciaSerializer
     queryset = Competencia.objects.all()
 
+
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-def editarCompetencia(request,pk=None):
+def editarCompetencia(request, pk=None):
     competencia = Competencia.objects.get(id=pk)
     competencia_serializer = CompetenciaTotal(competencia)
     return Response(competencia_serializer.data, status=status.HTTP_200_OK)
@@ -159,7 +157,7 @@ def guardarECompetencia(request):
         competencia = Competencia.objects.get(id=pk)
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
-    
+
     competencia.titulo = request.data.get('titulo')
     competencia.descripcion = request.data.get('descripcion')
 
@@ -170,16 +168,18 @@ def guardarECompetencia(request):
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
-@permission_classes((permissions.AllowAny,))
-# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def editarEjercitario(request):
-    if (request.method == 'PUT'):
-        id = request.data.get('id')
-        print(request.data)
+class UpdateEjercitario(generics.UpdateAPIView):
+    queryset = Ejercitario.objects.all()
+    serializer_class = EjercitarioUpdateSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
+
+@api_view(['PUT'])
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def editarEjercitario(request, pk):
     try:
-        ejercitario = Ejercitario.objects.get(id=id)
+        ejercitario = Ejercitario.objects.get(pk=pk)
 
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
@@ -191,7 +191,7 @@ def editarEjercitario(request):
     ejercitario.sector = request.data.get('sector')
     ejercitario.nivel = request.data.get('nivel')
     ejercitario.competencia_id = request.data.get('competencia')
-    ejercitario.urlEjercitario = request.data.get('urlEjercitario') 
+    ejercitario.urlEjercitario = request.data.get('urlEjercitario')
     ejercitario.instruccionPrincipalEjercitario = request.data.get(
         'instruccionPrincipalEjercitario')
     ejercitario.instruccionesParticipantes = request.data.get(
@@ -200,17 +200,20 @@ def editarEjercitario(request):
     try:
         ejercitario.save()
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
-    except:
+    except Exception as e:
+        print(e)
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
-@permission_classes((permissions.AllowAny,))
+#@permission_classes((permissions.AllowAny,))
 def registroEjercitario(request):
-
+    uuid = str(shortuuid.ShortUUID().random(length=4))
     file = request.FILES.get('file')
-    name = str(file.name)
-    filename = name.split('.')[0]
+
+    name = file.name.split('.')[0]
+    #filename = name.split('.')[0]
+    #file.name = name.split('.')[0] + "_" + uuid + name.split('.')[1]
     nombreDeEjercitario = request.data.get('nombreDeEjercitario')
     categoria = request.data.get('categoria')
     tipoDeEjercitario = request.data.get('tipoDeEjercitario')
@@ -223,25 +226,25 @@ def registroEjercitario(request):
     instruccionesParticipantes = request.data.get('instruccionesParticipantes')
     variaciones = request.data.get('variaciones')
 
-    fss = FileSystemStorage()
+    #str(shortuuid.ShortUUID().random(length=8))
+
+    #fss = FileSystemStorage()
     print(BASE_DIR, request._current_scheme_host)
-    file = fss.save(BASE_DIR/'media'/name, file)
+    #file = fss.save(BASE_DIR / 'media' / name, file)
+    #file = fss.save(os.path.join(BASE_DIR, "media", "web", ) / 'media' / name, file)
 
-    with ZipFile(BASE_DIR/'media'/name) as zip:
-        auxname = zip.filelist[0].filename.split('/')
-        filename = f'{hex(uuid.getnode())}'
-        zip.extractall(BASE_DIR/'media'/filename)
-    fss.delete(file)
+    with ZipFile(file, 'r') as zip_file:
+        # zip.printdir()
+        zip_file.extractall(os.path.join(BASE_DIR, "media", "web", uuid))
 
-    preview_adapted = os.path.join(
-        request._current_scheme_host, f'media/{filename}/web', 'index.html').replace("\\", "/")
+    preview = f'{request._current_scheme_host}/media/web/{uuid}/{name}/index.html'
 
     if not DEBUG:
-        preview_adapted = preview_adapted.replace("http://", "https://")
+        preview = preview.replace("http://", "https://")
 
     ejercitario = Ejercitario()
     ejercitario.categoria = categoria
-    ejercitario.urlEjercitario = preview_adapted
+    ejercitario.urlEjercitario = preview
     ejercitario.nombreDeEjercitario = nombreDeEjercitario
     ejercitario.tipoDeEjercitario = tipoDeEjercitario
     ejercitario.duracion = duracion
@@ -258,7 +261,7 @@ def registroEjercitario(request):
     except:
         return Response({'registro': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-       # fss = FileSystemStorage()
+    # fss = FileSystemStorage()
     # file = fss.save(BASE_DIR/'files'/nombreDeEjercitario, file)
 
     # with ZipFile(BASE_DIR/'files'/nombreDeEjercitario)as zip:
@@ -623,6 +626,7 @@ def getEstudiantesEjercitarioResponsable(request, ejercitario):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 '''
 
+
 # metodo ligado con getEstudiantesEjercitarioResponsable
 
 
@@ -648,7 +652,7 @@ def getNotasEstudianteEjercitarioResponsable(request, ejercitario, idParticipant
         for actiPart in actividadParticipante:
             contCalificaciones = contCalificaciones + actiPart.calificacionActividad
             contCalificacionesTiempo = contCalificacionesTiempo + \
-                actiPart.tiempoTotalResolucionEjercitario
+                                       actiPart.tiempoTotalResolucionEjercitario
             contnumeroActi = contnumeroActi + 1
 
         if (contnumeroActi > 0):

@@ -129,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
 TIME_ZONE = 'UTC'
 
@@ -242,3 +242,12 @@ SIMPLE_JWT = {
     'SIGNING_KEY': env('TOKEN_KEY'),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+EMAIL_HOST = 'in-v3.mailjet.com'
+MAILJET_API_KEY = env('MJ_APIKEY_PUBLIC')
+MAILJET_API_SECRET = env('MJ_APIKEY_PRIVATE')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = 30

@@ -1,20 +1,26 @@
-import os
-
+import datetime
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.template.loader import get_template
+
+from .emailsend import send_email
+from ..mixins import IsExpert
 from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-import hashlib
 import environ
 import pdfkit
 
 
 env = environ.Env()
+
+
+
+
 
 @api_view(['GET'])
 # @permission_classes((permissions.AllowAny,))
@@ -271,12 +277,48 @@ def download_certificado(request, idCompetencia, idParticipante):
 
 
 @api_view(['GET'])
+@permission_classes((IsExpert,))
 def descargar_certificado(request, idCompetencia, idParticipante):
     print(idCompetencia)
-    serializer = geanarar_certificado(idCompetencia, idParticipante, request)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    try:
+        cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
+        serializer = CertificadoSerializer(cert)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+
+        cert = geanarar_certificado(idCompetencia, idParticipante, request)
+        if cert == None:
+            return Response({"code": "error", "message": "error to generate cert"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = CertificadoSerializer(cert)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes((IsExpert,))
+def enviar_certificado(request, idCompetencia, idParticipante):
+    print(idCompetencia)
+    cert = None
+    try:
+        cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
+        res = send_email(cert)
+        if res:
+            return Response({"code": "ok", "message": "certificado enviado"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"code": "error", "message": res.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        if cert is None:
+            cert = geanarar_certificado(idCompetencia, idParticipante, request)
+            if cert is None:
+                return Response({"code": "error", "message": "error to generate cert"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                res = send_email(cert)
+                if res:
+                    return Response({"code": "ok", "message": "certificado enviado"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"code": "error", "message": res.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"code": "error", "message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def geanarar_certificado(idCompetencia, idParticipante, request):
@@ -287,18 +329,17 @@ def geanarar_certificado(idCompetencia, idParticipante, request):
 
     template = get_template('cert/certificate.html')
 
-
-
     # Add any context variables you need to be dynamically rendered in the HTML
     context = {}
 
     context["usuario"] = usuario
     context["competencia"] = competencia
     context["evaluador"] = evaluador
+    context["date"] = datetime.datetime.now()
     # Render the HTML
     html = template.render(context)
 
-    print(html)
+    #print(html)
 
     options = {
         'encoding': 'UTF-8',
@@ -312,16 +353,26 @@ def geanarar_certificado(idCompetencia, idParticipante, request):
 
     print("path", env('wkhtmltopdf'))
 
-    # Remember that location to wkhtmltopdf
-    config = pdfkit.configuration(wkhtmltopdf="C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe")
-    pdfkit.from_string(html, "file.pdf", configuration=config, options=options)
-    certificado = Certificado(
-        competencia=competencia,
-        participante_id=idParticipante,
-        #certificado=file_content
-    )
-    certificado.save()
-    return CertificadoSerializer(certificado)
+    file_content = None
+
+    try:
+        # Remember that location to wkhtmltopdf
+        config = pdfkit.configuration(wkhtmltopdf=env('wkhtmltopdf'))
+        file_content = pdfkit.from_string(html, False, configuration=config, options=options)
+
+        print("render ok")
+        certificado = Certificado(
+            competencia=competencia,
+            participante_id=idParticipante,
+            certificado=ContentFile(file_content, name=str(shortuuid.ShortUUID().random(length=24))+".pdf")
+        )
+        certificado.save()
+        return certificado
+
+    except Exception as e:
+        print(e)
+        #print(file_content)
+        return None
 
 
 
