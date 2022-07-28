@@ -1,4 +1,4 @@
-from rest_framework.generics import  ListAPIView
+from rest_framework.generics import ListAPIView
 
 from ..mixins import IsAdmin
 from ..serializers import *
@@ -66,10 +66,11 @@ def registrarDiscapacidad(request):
 def getDiscapacidad(request):
     if request.method == 'GET':
         discapacidad = Discapacidad.objects.all()
-        discapacidad_serializer = DiscapacidadSerializer(discapacidad, many =True)
+        discapacidad_serializer = DiscapacidadSerializer(discapacidad, many=True)
         return Response(discapacidad_serializer.data)
 
-class discapacidadTotal (ListAPIView):
+
+class discapacidadTotal(ListAPIView):
     serializer_class = DiscapacidadSerializer
     queryset = Discapacidad.objects.all()
 
@@ -84,15 +85,17 @@ def regiDiscapacidad(request):
     else:
         return Response(discapacidad_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
-def editarDiscapacidad(request,pk=None):
+@permission_classes((IsAdmin,))
+def editarDiscapacidad(request, pk=None):
     discapacidad = Discapacidad.objects.get(id=pk)
     discapacidad_serializer = DiscapacidadSerializer(discapacidad)
     return Response(discapacidad_serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
-@permission_classes((permissions.AllowAny,))
+@permission_classes((IsAdmin,))
 def guardarEditarDiscapacidad(request):
     pk = request.data.get('id')
     discapacidad = Discapacidad.objects.get(id=pk)
@@ -102,4 +105,3 @@ def guardarEditarDiscapacidad(request):
         return Response(discapacidad_serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(discapacidad_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

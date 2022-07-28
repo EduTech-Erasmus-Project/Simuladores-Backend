@@ -135,7 +135,7 @@ class Respuesta(models.Model):
 
 class Certificado(models.Model):
     fecha = models.DateField(auto_now=True)
-    certificado = models.FileField(blank=True, null=True)
+    certificado = models.FileField(upload_to='users/', blank=True, null=True)
     competencia = models.ForeignKey(Competencia, on_delete=models.CASCADE, null=True, blank=True,
                                     related_name="competencia_certificado")
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='participante_certificado',
