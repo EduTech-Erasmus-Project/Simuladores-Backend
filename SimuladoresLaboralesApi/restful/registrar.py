@@ -43,7 +43,7 @@ def verificacionPassword(password):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarParticipante(request):
-    print("DATOS OBTENIDOS   =====>    ", request.data)
+    #print("DATOS OBTENIDOS   =====>    ", request.data)
     email = request.data.get('email')
     password = request.data.get('password')
     if not validacionCorreo(email=email):
@@ -62,7 +62,7 @@ def registrarParticipante(request):
         try:
             evaluador = Evaluador.objects.get(usuario__codigo=request.data.get('codigo'))
         except Exception as e:
-            print(e)
+            #print(e)
             return Response({"status": "error", "code": "invalid_code", "message": "Codigo de docente invalido"},
                             status=status.HTTP_400_BAD_REQUEST)
 

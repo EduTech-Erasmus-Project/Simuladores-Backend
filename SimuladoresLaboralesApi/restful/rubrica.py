@@ -13,7 +13,7 @@ import re
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registroRubrica(request):
-    print(request.data)
+    #print(request.data)
 
     calificacion = request.data.get('calificacion')
     indicador = request.data.get('indicador')
@@ -36,7 +36,7 @@ def registroRubrica(request):
 def editarRubrica(request):
     if (request.method == 'PUT'):
         id = request.data.get('id')
-        print(request.data)
+        #print(request.data)
 
     try:
         rubrica = Rubrica.objects.get(id=id)
@@ -76,9 +76,9 @@ def listaRubrica(request, pk=None):
 @permission_classes((permissions.AllowAny,))
 def eliminarRubrica(request, pk=None):
     if request.method == 'DELETE':
-        print(f'-------->{pk}')
+        #print(f'-------->{pk}')
         rubrica = Rubrica.objects.filter(id=pk)
-        print(rubrica)
+        #print(rubrica)
         rubrica.delete()
 
         rubrica_serializar = RubricaTotal(rubrica)

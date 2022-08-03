@@ -201,7 +201,7 @@ def editarEjercitario(request, pk):
         ejercitario.save()
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(e)
+        #print(e)
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -229,7 +229,7 @@ def registroEjercitario(request):
     #str(shortuuid.ShortUUID().random(length=8))
 
     #fss = FileSystemStorage()
-    print(BASE_DIR, request._current_scheme_host)
+    #print(BASE_DIR, request._current_scheme_host)
     #file = fss.save(BASE_DIR / 'media' / name, file)
     #file = fss.save(os.path.join(BASE_DIR, "media", "web", ) / 'media' / name, file)
 
@@ -459,12 +459,12 @@ def contarParticipantesPorEvaluador(request):
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def obtenerDiscapacidad(request):
-    print(request)
+    #print(request)
     try:
         discapacidades = Discapacidad.objects.all().values()
         return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_200_OK)
     except Exception as e:
-        print("error", e)
+        #print("error", e)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 

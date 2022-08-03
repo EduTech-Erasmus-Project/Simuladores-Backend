@@ -55,7 +55,7 @@ class Login(TokenObtainPairView):
             username=email,
             password=password
         )
-        print(user)
+        #print(user)
         if user:
             if not user.estado:
                 return Response({"code": "user_inactive", "message": "Usuario inactivo"},
@@ -104,7 +104,7 @@ class Login(TokenObtainPairView):
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))  # IsExpert IsUser IsAdmin
 def logout(request):
-    print(request)
+    #print(request)
     user = get_object_or_404(Usuario, pk=request.user.id)
     if user is not None:
         RefreshToken.for_user(user)
