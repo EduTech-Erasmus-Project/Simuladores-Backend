@@ -1,28 +1,7 @@
-from distutils.command.upload import upload
 import os
-import uuid
-from http.client import error
-from turtle import title
-from unicodedata import name
-from urllib import response
-from django.db.models import Q, Sum
 from zipfile import ZipFile
-from django.core.files.storage import FileSystemStorage
-
-# from firebase_admin import storage
-
-from django.shortcuts import render
-from django.views.generic import TemplateView
-from django.core.files.storage import FileSystemStorage
-from SimuladoresLaboralesApi.views import EjercitarioViewSet
-
-# from main.settings import BASE_DIR
-
-# from ..mixins import ValidateToken
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from unityREST.settings import DEBUG
-
-from usuario.models import Participante
 from usuario.views import BASE_DIR
 from ..mixins import IsExpert
 from ..serializers import *
