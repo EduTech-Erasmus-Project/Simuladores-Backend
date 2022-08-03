@@ -22,7 +22,7 @@ def editarPregunta(request):
     try:
         pregunta = Pregunta.objects.get(id=id)
 
-        print(pregunta)
+        #print(pregunta)
 
     except:
         return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
@@ -35,7 +35,7 @@ def editarPregunta(request):
         pregunta.save()
         return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(e)
+        #print(e)
         return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -67,15 +67,15 @@ def eliminarPregunta(request, pk=None):
         # pregunta.save()
 
         preguntas = Pregunta.objects.filter(preguntaDelEjercitario_id=ejercitario).order_by('id')
-        print("data 0", preguntas[0].id)
+        #print("data 0", preguntas[0].id)
 
         num = 1
         for p in preguntas:
-            print("prev numero", p.numeroPregunta)
+            #print("prev numero", p.numeroPregunta)
             p.numeroPregunta = num
             num += 1
             p.save()
-            print("current numero", p.numeroPregunta)
+            #print("current numero", p.numeroPregunta)
 
 
         pregunta_serializar = PreguntaTotal(preguntas, many=True)
@@ -96,5 +96,5 @@ def registroPregunta(request):
                 seriealizer.save()
         return Response({'registropregunta': 'ok', "data": request.data.get("questions")}, status=status.HTTP_200_OK)
     except Exception as e:
-        print(e)
+        #print(e)
         return Response({'registropregunta': 'error', "message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)

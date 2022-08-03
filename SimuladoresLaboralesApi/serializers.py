@@ -208,7 +208,7 @@ class CompetenciaSerializer(serializers.ModelSerializer):
             serializer2 = EjercitarioSerializer(ejercitariosN2, many=True, context=self.context['request'].user)
             serializer3 = EjercitarioSerializer(ejercitariosN3, many=True, context=self.context['request'].user)
         except Exception as e:
-            print(e)
+            #print(e)
             return {}
 
         return {
@@ -246,7 +246,7 @@ class CompetenciaSerializer(serializers.ModelSerializer):
         if len(serializer.data) == 0:
             return False
         else:
-            sum(item['progreso'] for item in serializer.data) / len(serializer.data) == 100
+            return sum(item['progreso'] for item in serializer.data) / len(serializer.data) == 100
 
 
 class CompetenciaTotal(serializers.ModelSerializer):
@@ -415,15 +415,15 @@ class ActividadSerializer(serializers.ModelSerializer):
         if instance.calificacion >= 75 and instance.calificacion <= 100:
             rubrica = list(filter(lambda d: d['calificacion'] == 100, rubrica))[0]
 
-        print("id", rubrica)
-        print("instance", instance)
-        print("data", model_to_dict(instance))
+        #print("id", rubrica)
+        #print("instance", instance)
+        #print("data", model_to_dict(instance))
 
         data = {
             "actividad": model_to_dict(instance),
             "rubrica": rubrica,
         }
-        print(data)
+        #print(data)
 
         return data
 
@@ -459,6 +459,8 @@ class UsuarioCalificacionGlobalSerializer(serializers.ModelSerializer):
             nivel = 3
             tiempo = round(sum(item['tiempoTotal'] for item in nivel3) / len(nivel3), 2)
             progreso += nivel3[0]["calificacion"]
+
+        #print(nivel)
 
         # nivel*100/3
         return {

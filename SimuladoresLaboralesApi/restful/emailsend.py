@@ -26,5 +26,5 @@ def send_email(cert=None):
         msg.send()
         return True
     except Exception as e:
-        print("error send", e)
+        #print("error send", e)
         return e

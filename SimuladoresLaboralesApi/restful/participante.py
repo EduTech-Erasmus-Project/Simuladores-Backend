@@ -262,7 +262,7 @@ def getReporte(request, idCompetencia, idParticipante):
 
         return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
-        print(e)
+        #print(e)
         return Response({"status": "error", "code": "not_found"}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -279,7 +279,7 @@ def download_certificado(request, idCompetencia, idParticipante):
 @api_view(['GET'])
 @permission_classes((IsExpert,))
 def descargar_certificado(request, idCompetencia, idParticipante):
-    print(idCompetencia)
+    #print(idCompetencia)
     try:
         cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
         serializer = CertificadoSerializer(cert)
@@ -297,7 +297,7 @@ def descargar_certificado(request, idCompetencia, idParticipante):
 @api_view(['GET'])
 @permission_classes((IsExpert,))
 def enviar_certificado(request, idCompetencia, idParticipante):
-    print(idCompetencia)
+    #print(idCompetencia)
     cert = None
     try:
         cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
@@ -351,7 +351,7 @@ def geanarar_certificado(idCompetencia, idParticipante, request):
         ],
     }
 
-    print("path", env('wkhtmltopdf'))
+    #print("path", env('wkhtmltopdf'))
 
     file_content = None
 
@@ -360,7 +360,7 @@ def geanarar_certificado(idCompetencia, idParticipante, request):
         config = pdfkit.configuration(wkhtmltopdf=env('wkhtmltopdf'))
         file_content = pdfkit.from_string(html, False, configuration=config, options=options)
 
-        print("render ok")
+        #print("render ok")
         certificado = Certificado(
             competencia=competencia,
             participante_id=idParticipante,
