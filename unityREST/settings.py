@@ -14,6 +14,7 @@ from pathlib import Path
 import environ
 import os
 import datetime
+from datetime import timedelta
 
 env = environ.Env(
     # set casting, default value
@@ -23,9 +24,8 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# reading .env file
+# reading enviroment.env file
 environ.Env.read_env(os.path.join(BASE_DIR, 'enviroment.env'))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -33,11 +33,12 @@ environ.Env.read_env(os.path.join(BASE_DIR, 'enviroment.env'))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
+TOKEN_KEY = env('SECRET_KEY')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['*','localhost', '127.0.0.1', '172.16.42.78', 'simulab.edutech-project.org']
-
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '172.16.42.78', 'simulab.edutech-project.org']
 
 # Application definition
 
@@ -48,15 +49,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'envioREST.apps.EnviorestConfig',
-    'users.apps.UsersConfig',
+    'envioREST',
     'rest_framework',
-    'SimuladoresLaboralesApi.apps.SimuladoreslaboralesapiConfig',
-    "corsheaders",
+    'rest_framework_simplejwt',
+    'SimuladoresLaboralesApi',
+    'adminApi',
+    'corsheaders',
     'allauth',
     'allauth.account',
     'rest_auth',
     'rest_auth.registration',
+    'usuario',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +79,7 @@ ROOT_URLCONF = 'unityREST.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/envioREST'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,7 +94,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'unityREST.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -105,7 +107,6 @@ DATABASES = {
         'PORT': env('POSTGRESQL_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -125,11 +126,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
 TIME_ZONE = 'UTC'
 
@@ -139,12 +139,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -155,11 +155,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # permite que nuestras viewsets de sólo lectura incluso para visitantes no autenticados
-REST_FRAMEWORK = {
-  'DEFAULT_PERMISSION_CLASSES': [                     
-    'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-  ],
-}
+
 
 CORS_ORIGIN_ALLOW_ALL: True
 CORS_ALLOW_CREDENTIALS: True
@@ -205,9 +201,53 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
     "responseType",
 ]
-
-JWT_AUTH = {
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+''' 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'SimuladoresLaboralesApi.authentication.ExpiringTokenAuthentication',  # custom authentication class
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        # 'SimuladoresLaboralesApi.mixins.ValidateToken',
+    ],
 }
 
+AUTH_USER_MODEL = 'usuario.Usuario'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
+    'ROTATE_REFRESH_TOKENS': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': env('TOKEN_KEY'),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+EMAIL_HOST = 'in-v3.mailjet.com'
+MAILJET_API_KEY = env('MJ_APIKEY_PUBLIC')
+MAILJET_API_SECRET = env('MJ_APIKEY_PRIVATE')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = 30

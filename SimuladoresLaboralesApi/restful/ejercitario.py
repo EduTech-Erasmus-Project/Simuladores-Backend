@@ -1,478 +1,767 @@
-import email
-from typing import Counter
-from urllib import request
-from ..models import * 
-from ..serializers import * 
+from distutils.command.upload import upload
+import os
+import uuid
+from http.client import error
+from turtle import title
+from unicodedata import name
+from urllib import response
+from django.db.models import Q, Sum
+from zipfile import ZipFile
+from django.core.files.storage import FileSystemStorage
+
+# from firebase_admin import storage
+
+from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.core.files.storage import FileSystemStorage
+from SimuladoresLaboralesApi.views import EjercitarioViewSet
+
+# from main.settings import BASE_DIR
+
+# from ..mixins import ValidateToken
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+from unityREST.settings import DEBUG
+
+from usuario.models import Participante
+from usuario.views import BASE_DIR
+from ..mixins import IsExpert
+from ..serializers import *
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
-from django.http import HttpResponse
-from rest_framework import serializers
-from django.core import serializers as core_serializers
-import json
 from django.http import JsonResponse
+from rest_framework_simplejwt.tokens import AccessToken
+from collections import Counter
 
+''' 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def crearNuevoEjercitario(request):
-    #--------------Por realizar---------------- 
+    # --------------Por realizar----------------
     correoParticipante = request.data.get('participante')
     correoEvaluador = request.data.get('evaluador')
-    try: 
-        participante = Participante.objects.get(email=correoParticipante) 
-        evaluador = Evaluador.objects.get(email=correoEvaluador)  
-    except: 
+    try:
+        participante = Participante.objects.get(email=correoParticipante)
+        evaluador = Evaluador.objects.get(email=correoEvaluador)
+    except:
         print("Error en busqueda de correo en participantes o evaluadores")
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     asignacionRegistrar = {
-        'fechaAsignacion' : request.data.get('fechaAsignacion'),
-        'participante' : participante.id,
-        'evaluador' : evaluador.id
+        'fechaAsignacion': request.data.get('fechaAsignacion'),
+        'participante': participante.id,
+        'evaluador': evaluador.id
     }
-    
+
     asignacionRegistrar_serializer = asignacionSerializerObjects(data=asignacionRegistrar)
-    
+
     if asignacionRegistrar_serializer.is_valid():
         asignacionRegistrar_serializer.save()
-        return Response({"status": "registrado"}, status=status.HTTP_201_CREATED) 
-    
+        return Response({"status": "registrado"}, status=status.HTTP_201_CREATED)
+
     return Response(asignacionRegistrar_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
 
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def obtenerAsignacionDeEjercitarioDeUnParticipante(request): 
-    correoParticipante = request.data.get('correo')
-    
-    try: 
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def obtenerAsignacionDeEjercitarioDeUnParticipante(request):
+    correoParticipante = request.user["email"]
+    # correoParticipante = request.data.get('correo')
+
+    try:
         participanteObtenido = Participante.objects.get(email=correoParticipante)
-    except: 
+    except:
         print("Error en busqueda de correo en participante")
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    try: 
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
         asignaciones = Asignacion.objects.all().filter(participante=participanteObtenido).values()
-    except: 
+    except:
         print("Error en busqueda de Asignaciones")
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     return JsonResponse({"asignaciones": list(asignaciones)})
+'''
+
+
+# verificar metodo
+
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def obtenerListaDeEscenarios(request):
-
     correoEvaluador = request.data.get('evaluador')
     try:
         evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
-        asignaciones = Asignacion.objects.all().filter(evaluador= evaluadorEjer).values()
-        return JsonResponse({"asignaciones": list(asignaciones)})      
+        # asignaciones = Asignacion.objects.all().filter(evaluador=evaluadorEjer).values()
+        # return JsonResponse({"asignaciones": list(asignaciones)})
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getEscenarios(request):
-    try:
-        escenarios = Ejercitario.objects.all()
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    ejercitarios = []
-    for escenario in escenarios:
-        informacionEscenario = {
-            'name' : escenario.nombreDeEjercitario,
-            'value' : escenario.numeroDeEjercitario,
-        }
-        ejercitarios.append(informacionEscenario)
-    return Response(ejercitarios)
+def listaEjercitario(request):
+    if request.method == 'GET':
+        ejercitario = Ejercitario.objects.all()
+        ejercitario_serializar = EjercitarioCompetenciaSerializer(
+            ejercitario, many=True)
+        return Response(ejercitario_serializar.data)
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getEscenario(request,pk):
+def getTotalEjercitarios(request):
     try:
-        escenario = Ejercitario.objects.get(idEjercitario= pk)
+        ejercitarios = Ejercitario.objects.all().count()
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    escenario_serializer = EjercitarioSerializerObjects(escenario)
-    return Response(escenario_serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"total": ejercitarios})
+
+
+class CompetenciasRetrieveAPIView(ListAPIView):
+    serializer_class = CompetenciaSerializer
+    queryset = Competencia.objects.all()
+
+
+class CompetenciaT(ListAPIView):
+    serializer_class = CompetenciaTotal
+    queryset = Competencia.objects.all()
+
+
+class CompetenciaRetrieveAPIView(RetrieveAPIView):
+    serializer_class = CompetenciaSerializer
+    queryset = Competencia.objects.all()
+
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getEscenarioPorNumero(request,numeroDeEjercitario):
-    try:
-        escenario = Ejercitario.objects.get(numeroDeEjercitario= numeroDeEjercitario)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    escenario_serializer = EjercitarioSerializerObjects(escenario)
-    return Response(escenario_serializer.data)
+def editarCompetencia(request, pk=None):
+    competencia = Competencia.objects.get(id=pk)
+    competencia_serializer = CompetenciaTotal(competencia)
+    return Response(competencia_serializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['PUT'])
+@permission_classes((permissions.AllowAny,))
+def guardarECompetencia(request):
+    if (request.method == 'PUT'):
+        pk = request.data.get('id')
+
+    try:
+        competencia = Competencia.objects.get(id=pk)
+    except:
+        return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
+
+    competencia.titulo = request.data.get('titulo')
+    competencia.descripcion = request.data.get('descripcion')
+
+    try:
+        competencia.save()
+        return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
+    except:
+        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateEjercitario(generics.UpdateAPIView):
+    queryset = Ejercitario.objects.all()
+    serializer_class = EjercitarioUpdateSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+@api_view(['PUT'])
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def editarEjercitario(request, pk):
+    try:
+        ejercitario = Ejercitario.objects.get(pk=pk)
+
+    except:
+        return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
+
+    ejercitario.nombreDeEjercitario = request.data.get('nombreDeEjercitario')
+    ejercitario.categoria = request.data.get('categoria')
+    ejercitario.tipoDeEjercitario = request.data.get('tipoDeEjercitario')
+    ejercitario.duracion = int(request.data.get('duracion'))
+    ejercitario.sector = request.data.get('sector')
+    ejercitario.nivel = request.data.get('nivel')
+    ejercitario.competencia_id = request.data.get('competencia')
+    ejercitario.urlEjercitario = request.data.get('urlEjercitario')
+    ejercitario.instruccionPrincipalEjercitario = request.data.get(
+        'instruccionPrincipalEjercitario')
+    ejercitario.instruccionesParticipantes = request.data.get(
+        'instruccionesParticipantes')
+    ejercitario.variaciones = request.data.get('variaciones')
+    try:
+        ejercitario.save()
+        return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        #print(e)
+        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+#@permission_classes((permissions.AllowAny,))
+def registroEjercitario(request):
+    uuid = str(shortuuid.ShortUUID().random(length=4))
+    file = request.FILES.get('file')
+
+    name = file.name.split('.')[0]
+    #filename = name.split('.')[0]
+    #file.name = name.split('.')[0] + "_" + uuid + name.split('.')[1]
+    nombreDeEjercitario = request.data.get('nombreDeEjercitario')
+    categoria = request.data.get('categoria')
+    tipoDeEjercitario = request.data.get('tipoDeEjercitario')
+    duracion = int(request.data.get('duracion'))
+    sector = request.data.get('sector')
+    nivel = request.data.get('nivel')
+    competencia = request.data.get('competencia')
+    instruccionPrincipalEjercitario = request.data.get(
+        'instruccionPrincipalEjercitario')
+    instruccionesParticipantes = request.data.get('instruccionesParticipantes')
+    variaciones = request.data.get('variaciones')
+
+    #str(shortuuid.ShortUUID().random(length=8))
+
+    #fss = FileSystemStorage()
+    #print(BASE_DIR, request._current_scheme_host)
+    #file = fss.save(BASE_DIR / 'media' / name, file)
+    #file = fss.save(os.path.join(BASE_DIR, "media", "web", ) / 'media' / name, file)
+
+    with ZipFile(file, 'r') as zip_file:
+        # zip.printdir()
+        zip_file.extractall(os.path.join(BASE_DIR, "media", "web", uuid))
+
+    preview = f'{request._current_scheme_host}/media/web/{uuid}/{name}/index.html'
+
+    if not DEBUG:
+        preview = preview.replace("http://", "https://")
+
+    ejercitario = Ejercitario()
+    ejercitario.categoria = categoria
+    ejercitario.urlEjercitario = preview
+    ejercitario.nombreDeEjercitario = nombreDeEjercitario
+    ejercitario.tipoDeEjercitario = tipoDeEjercitario
+    ejercitario.duracion = duracion
+    ejercitario.sector = sector
+    ejercitario.nivel = nivel
+    ejercitario.competencia_id = competencia
+    ejercitario.instruccionesParticipantes = instruccionesParticipantes
+    ejercitario.instruccionPrincipalEjercitario = instruccionPrincipalEjercitario
+    ejercitario.variaciones = variaciones
+
+    try:
+        ejercitario.save()
+        return Response({'registro': 'ok'}, status=status.HTTP_200_OK)
+    except:
+        return Response({'registro': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # fss = FileSystemStorage()
+    # file = fss.save(BASE_DIR/'files'/nombreDeEjercitario, file)
+
+    # with ZipFile(BASE_DIR/'files'/nombreDeEjercitario)as zip:
+    #     zip.extractall(BASE_DIR/'files')
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def recuperarEjercitario(request, pk=None):
+    if request.method == 'GET':
+        ejercitario = Ejercitario.objects.get(id=pk)
+        ejercitarioCompetencia_serializer = EjercitarioCompetenciaSerializer(
+            ejercitario)
+        return Response(ejercitarioCompetencia_serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def crearGraficaInicioExpertoTipoDiscapacidadVsNota(request):
+def registroCompetencia(request):
+    competencia_serializer = CompetenciaTotal(data=request.data)
+    if competencia_serializer.is_valid():
+        competencia_serializer.save()
+        return Response(competencia_serializer.data)
+    return Response(competencia_serializer.errors)
 
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getEscenario(request, pk):
+    try:
+        escenario = Ejercitario.objects.get(idEjercitario=pk)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    escenario_serializer = EjercitarioSerializerObjects(escenario)
+    return Response(escenario_serializer.data)
+
+
+@api_view(['GET'])
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getEscenarioPorNumero(request, numeroDeEjercitario):
+    try:
+        escenario = Ejercitario.objects.get(pk=numeroDeEjercitario)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    escenario_serializer = EjercitarioSerializerObjects(escenario)
+    return Response(escenario_serializer.data)
+
+
+'''
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def crearGraficaInicioExpertoTipoDiscapacidadVsNota(request):
     correoEvaluador = request.data.get('evaluador')
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
-        ListaParticipantediscapacidad= []
+        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
+        participantes = Participante.objects.all().filter(responsable=evaluadorEjer)
+        ListaParticipantediscapacidad = []
         for p in participantes:
-            discapacidadPorParticipante = DiscapacidadParticipante.objects.all().filter(participante = p)
+            discapacidadPorParticipante = DiscapacidadParticipante.objects.all().filter(participante=p)
 
             for discap in discapacidadPorParticipante:
-                actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = discap.participante.id)
-                
-                
+                actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante=discap.participante.id)
+
                 diccionarioConParticipantes = {
-                    
-                        'participante' : discap.participante.id,
-                        'participanteGenero' : discap.participante.genero,
-                        'discapacidad' : discap.discapacidad.idDiscapacidad,
-                        'tipoDiscapacidad' : discap.discapacidad.tipoDiscapacidad
+
+                    'participante': discap.participante.id,
+                    'participanteGenero': discap.participante.genero,
+                    'discapacidad': discap.discapacidad.idDiscapacidad,
+                    'tipoDiscapacidad': discap.discapacidad.tipoDiscapacidad
                 }
 
                 listadoCalificaciones = []
                 contCalificaciones = 0
-                contCalificacionesTiempo  = 0
+                contCalificacionesTiempo = 0
                 contnumeroActi = 0
                 for actiPart in actividadParticipante:
-                    contCalificaciones = contCalificaciones+actiPart.calificacionActividad 
-                    contCalificacionesTiempo = contCalificacionesTiempo+actiPart.tiempoTotalResolucionEjercitario
+                    contCalificaciones = contCalificaciones + actiPart.calificacionActividad
+                    contCalificacionesTiempo = contCalificacionesTiempo + actiPart.tiempoTotalResolucionEjercitario
                     contnumeroActi = contnumeroActi + 1
 
                 if (contnumeroActi > 0):
                     diccionarioConParticipantesDict = {
-                        'calificacion':  (contCalificaciones/contnumeroActi),
-                        'tiempo':  (contCalificacionesTiempo/contnumeroActi)
+                        'calificacion': (contCalificaciones / contnumeroActi),
+                        'tiempo': (contCalificacionesTiempo / contnumeroActi)
                     }
                     listadoCalificaciones.append(diccionarioConParticipantesDict)
                 else:
                     diccionarioConParticipantesDict = {
-                        'calificacion':  0,
-                        'tiempo':  0
+                        'calificacion': 0,
+                        'tiempo': 0
                     }
                     listadoCalificaciones.append(diccionarioConParticipantesDict)
                 diccionarioConParticipantes['calificaciones'] = listadoCalificaciones
 
                 ListaParticipantediscapacidad.append(diccionarioConParticipantes)
 
-            
-            
         return JsonResponse({"participantes": ListaParticipantediscapacidad}, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-
-
-
-
-
+        return Response(status=status.HTTP_404_NOT_FOUND)
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaInformacionGeneralTipoDiscapacidadVsNotaGeneral(request):
-    #correoEvaluador = request.data.get('evaluador')
-    #generoParaGrafica = request.data.get('generoParaGrafica')
-    #discapacidadParaGrafica=request.data.get('discapacidadParaGrafica')
+    # correoEvaluador = request.data.get('evaluador')
+    # generoParaGrafica = request.data.get('generoParaGrafica')
+    # discapacidadParaGrafica=request.data.get('discapacidadParaGrafica')
     participante = request.data.get('participante')
     listaNotaPorEvaluador = []
-    try: 
-        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = participante)
+    try:
+        actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante=participante)
 
         for actiPart in actividadParticipante:
-                diccionarioConParticipantesNotas = {
-                    
-                    'calificacionActividad' : actiPart.calificacionActividad
-                }
-                listaNotaPorEvaluador.append(diccionarioConParticipantesNotas)
+            diccionarioConParticipantesNotas = {
 
-        
-        
+                'calificacionActividad': actiPart.calificacionActividad
+            }
+            listaNotaPorEvaluador.append(diccionarioConParticipantesNotas)
+
         return JsonResponse({"notaGeneral": listaNotaPorEvaluador}, status=status.HTTP_201_CREATED)
-    except: 
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+'''
 
 
-
-
-
-
-@api_view(['POST'])
-@permission_classes((permissions.AllowAny,))
+@api_view(['GET'])
+@permission_classes((IsExpert,))
 def obtenerTipoGeneroPorEvaluador(request):
-    
-    correoEvaluador = request.data.get('evaluador')
-    try: 
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        
-        participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
-        
-
-        ListaParticipanteGenero= []
-        for participante in participantes:
-            ListaParticipanteGenero.append(participante.genero)
-        
-        listaGeneroEvaludor = list(Counter(ListaParticipanteGenero).keys())
-         
-        return JsonResponse({"participanteGenero": listaGeneroEvaludor}, status=status.HTTP_201_CREATED)    
-    except: 
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+    idEvaluador = request.user.id
+    participantes = Usuario.objects.filter(usuario_participante__evaluador__usuario_id=idEvaluador,
+                                           usuario_participante__aceptacionResponsable="aprobado")
+    ListaParticipanteGenero = []
+    for participante in participantes:
+        ListaParticipanteGenero.append(str(participante.genero))
+    counter = Counter(ListaParticipanteGenero)
+    listaGeneroEvaludor = [{key: value} for key, value in counter.items()]
+    return JsonResponse({"participanteGenero": listaGeneroEvaludor}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes((IsExpert,))  # permiso sin token
+def obtenerDiscapacidadesPorEvaluador(request):
+    idEvaluador = request.user.id
+    # print(idEvaluador)
+    # TipoDiscapacidad__participante__aceptacionPendianteResponsable="aprobado"
+    discapacidades = Discapacidad.objects.filter(TipoDiscapacidad__participante__evaluador__usuario_id=idEvaluador,
+                                                 TipoDiscapacidad__participante__aceptacionResponsable="aprobado")
+    # print("discapacidades", discapacidades)
+    ListaParticipanteGenero = []
+    for dicapacidad in discapacidades:
+        ListaParticipanteGenero.append(str(dicapacidad.tipoDiscapacidad))
+    counter = Counter(ListaParticipanteGenero)
+    listaDiscapacidadEvaludor = [{key: value}
+                                 for key, value in counter.items()]
+    return JsonResponse({"participanteDiscapacidad": listaDiscapacidadEvaludor}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes((IsExpert,))  # permiso sin token
+def obtenerParticipantesEjercitarioPorEvaluador(request):
+    idEvaluador = request.user.id
+    # ejercitarios = Ejercitario.objects.filter(AsignacionEjercitario__evaluador__usuario_id=idEvaluador, AsignacionEjercitario__participante__aceptacionResponsable="aprobado")
+
+    # ejercitarios = Ejercitario.objects.filter(competencia__asignacion_competencia__evaluador__usuario_id=idEvaluador,
+    # competencia__asignacion_competencia__participante__aceptacionResponsable="aprobado")
+
+    actividades = Actividad.objects.filter(
+        participante__evaluador__usuario_id=idEvaluador)
+    competencia = Competencia.objects.filter(
+        competencia_ejercitario__actividad_ejercitario__in=actividades)
+
+    # print("ejercitario", ejercitarios)
+    ListaParticipanteCompetencia = []
+    for competencia in competencia:
+        ListaParticipanteCompetencia.append(str(competencia.titulo))
+    counter = Counter(ListaParticipanteCompetencia)
+    listaEjercitarioEvaludor = [{key: value} for key, value in counter.items()]
+    return JsonResponse({"participanteEjercitario": listaEjercitarioEvaludor}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+# @permission_classes((permissions.AllowAny,)) permiso sin token
+def contarParticipantesPorEvaluador(request):
+    idEvaluador = request.user.id
+    participantes = Participante.objects.all().filter(evaluador__usuario_id=idEvaluador,
+                                                      aceptacionResponsable="aprobado").count()
+    return JsonResponse({"totalParticipantes": participantes}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
 def obtenerDiscapacidad(request):
-    try: 
+    #print(request)
+    try:
         discapacidades = Discapacidad.objects.all().values()
-        return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_201_CREATED)    
-    except: 
+        return JsonResponse({"discapacidades": list(discapacidades)}, status=status.HTTP_200_OK)
+    except Exception as e:
+        #print("error", e)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-
-
-
-
-
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaInfoExpertoTipoDiscapacidadVsNotas(request):
-
     correoEvaluador = request.data.get('evaluador')
     numeroEjercitario = request.data.get('numeroEjercitario')
 
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
-        ejercitario = Ejercitario.objects.get(numeroDeEjercitario = numeroEjercitario)
+        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
+        participantes = Participante.objects.all().filter(responsable=evaluadorEjer)
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=numeroEjercitario)
 
-
-        ListaParticipantediscapacidad= []
+        ListaParticipantediscapacidad = []
         for p in participantes:
-            discapacidadPorParticipante = DiscapacidadParticipante.objects.all().filter(participante = p)
-            
+            discapacidadPorParticipante = DiscapacidadParticipante.objects.all().filter(participante=p)
+
             for discap in discapacidadPorParticipante:
-                actividadParticipante = Actividad.objects.all().filter(ActividadDeParticipante = discap.participante.id).filter(ActividadPorEjercitario = ejercitario)
-                
-                
-                if (len(actividadParticipante) > 0 ):
+                actividadParticipante = Actividad.objects.all().filter(
+                    ActividadDeParticipante=discap.participante.id).filter(ActividadPorEjercitario=ejercitario)
+
+                if (len(actividadParticipante) > 0):
 
                     diccionarioConParticipantes = {
-                            'ejercitario' : ejercitario.numeroDeEjercitario,
-                            'participante' : discap.participante.id,
-                            'participanteGenero' : discap.participante.genero,
-                            'discapacidad' : discap.discapacidad.idDiscapacidad,
-                            'tipoDiscapacidad' : discap.discapacidad.tipoDiscapacidad
+                        'ejercitario': ejercitario.numeroDeEjercitario,
+                        'participante': discap.participante.id,
+                        'participanteGenero': discap.participante.genero,
+                        'discapacidad': discap.discapacidad.idDiscapacidad,
+                        'tipoDiscapacidad': discap.discapacidad.tipoDiscapacidad
                     }
 
                     listadoCalificaciones = []
                     contCalificaciones = 0
-                    contCalificacionesTiempo  = 0
+                    contCalificacionesTiempo = 0
                     contnumeroActi = 0
                     for actiPart in actividadParticipante:
-                        contCalificaciones = contCalificaciones+actiPart.calificacionActividad 
-                        contCalificacionesTiempo = contCalificacionesTiempo+actiPart.tiempoTotalResolucionEjercitario
+                        contCalificaciones = contCalificaciones + actiPart.calificacionActividad
+                        contCalificacionesTiempo = contCalificacionesTiempo + actiPart.tiempoTotalResolucionEjercitario
                         contnumeroActi = contnumeroActi + 1
 
                     if (contnumeroActi > 0):
                         diccionarioConParticipantesDict = {
-                            'calificacion':  (contCalificaciones/contnumeroActi),
-                            'tiempo':  (contCalificacionesTiempo/contnumeroActi)
+                            'calificacion': (contCalificaciones / contnumeroActi),
+                            'tiempo': (contCalificacionesTiempo / contnumeroActi)
                         }
                         listadoCalificaciones.append(diccionarioConParticipantesDict)
                     else:
                         diccionarioConParticipantesDict = {
-                            'calificacion':  0,
-                            'tiempo':  0
+                            'calificacion': 0,
+                            'tiempo': 0
                         }
                         listadoCalificaciones.append(diccionarioConParticipantesDict)
                     diccionarioConParticipantes['calificaciones'] = listadoCalificaciones
 
                     ListaParticipantediscapacidad.append(diccionarioConParticipantes)
 
-            
-            
         return JsonResponse({"participantes": ListaParticipantediscapacidad}, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-
-
-  
-
-
-
-
+        return Response(status=status.HTTP_404_NOT_FOUND)
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficaPastelGeneroPorEjercitario(request):
-
     correoEvaluador = request.data.get('evaluador')
     numeroEjercitario = request.data.get('numeroEjercitario')
 
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        participantes = Participante.objects.all().filter(responsable = evaluadorEjer)
-        ejercitario = Ejercitario.objects.get(numeroDeEjercitario = numeroEjercitario)
-        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario = ejercitario)
-        contMujer = 0 
-        contHombre = 0 
-        contLGBT = 0 
-        contOtros = 0 
-        
+        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
+        participantes = Participante.objects.all().filter(responsable=evaluadorEjer)
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=numeroEjercitario)
+        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario=ejercitario)
+        contMujer = 0
+        contHombre = 0
+        contLGBT = 0
+        contOtros = 0
+
         for actPar in actividadParticipante:
-            for participante in participantes: 
-                if((actPar.ActividadDeParticipante.id == participante.id) and(participante.genero == 'Mujeres') ):   
+            for participante in participantes:
+                if ((actPar.ActividadDeParticipante.id == participante.id) and (participante.genero == 'Mujeres')):
                     contMujer = contMujer + 1
-                if((actPar.ActividadDeParticipante.id == participante.id) and(participante.genero == 'Hombres') ):   
+                if ((actPar.ActividadDeParticipante.id == participante.id) and (participante.genero == 'Hombres')):
                     contHombre = contHombre + 1
-                if((actPar.ActividadDeParticipante.id == participante.id) and(participante.genero == 'LGBT') ):   
+                if ((actPar.ActividadDeParticipante.id == participante.id) and (participante.genero == 'LGBT')):
                     contLGBT = contLGBT + 1
-                if((actPar.ActividadDeParticipante.id == participante.id) and(participante.genero == 'Otros') ):   
+                if ((actPar.ActividadDeParticipante.id == participante.id) and (participante.genero == 'Otros')):
                     contOtros = contOtros + 1
-        
-        generosSeresHumanos = [contHombre, contMujer,contLGBT, contOtros] 
-                
+
+        generosSeresHumanos = [contHombre, contMujer, contLGBT, contOtros]
+
         return JsonResponse({"participantes": generosSeresHumanos}, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-
-
-
-
-
+        return Response(status=status.HTTP_404_NOT_FOUND)
+'''
+'''
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def graficainfoParticipanteIntentosVsNotasTiempo(request):
-
     correoEvaluador = request.data.get('evaluador')
     numeroEjercitario = request.data.get('numeroEjercitario')
     participante = request.data.get('participante')
 
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        participanteUno = Participante.objects.all().filter(id = participante )
-        ejercitario = Ejercitario.objects.get(numeroDeEjercitario = numeroEjercitario)
-        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario = ejercitario)
+        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador)
+        participanteUno = Participante.objects.all().filter(id=participante)
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=numeroEjercitario)
+        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario=ejercitario)
         listadoCalificaciones = []
-        for actp in actividadParticipante :
-                diccionarioConParticipantesDict = {
-                    'participante':  actp.ActividadDeParticipante,
-                    'nota':  actp.calificacionActividad
-                }
-                listadoCalificaciones.append(diccionarioConParticipantesDict)
-        
-       
-                
+        for actp in actividadParticipante:
+            diccionarioConParticipantesDict = {
+                'participante': actp.ActividadDeParticipante,
+                'nota': actp.calificacionActividad
+            }
+            listadoCalificaciones.append(diccionarioConParticipantesDict)
+
         return JsonResponse({"participantes": listadoCalificaciones}, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-
-
+        return Response(status=status.HTTP_404_NOT_FOUND)
+'''
+'''
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getEstudiantesEjercitarioResponsable(request,correo, ejercitario):
+# @permission_classes((permissions.AllowAny,))
+@permission_classes((IsExpert,))
+def getEstudiantesEjercitarioResponsable(request, ejercitario):
+    # print("ejercitario", ejercitario)
+    responsable = request.user.id
+    # print("ejercitario", ejercitario)
     try:
-        escenario = Ejercitario.objects.get(numeroDeEjercitario= ejercitario)
-        responsable = Evaluador.objects.get(email = correo)
-        asignaciones = Asignacion.objects.all().filter(evaluador = responsable).filter(ejercitario = escenario)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+        escenario = Ejercitario.objects.get(pk=ejercitario)
+        responsable = Evaluador.objects.get(usuario_id=responsable)
+        asignaciones = Asignacion.objects.filter(evaluador=responsable, competencia__Competencia__id=escenario.id)
+        # print("asignaciones", asignaciones)
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     participantesList = []
     for asignacion in asignaciones:
         cont = 0
-        if(participantesList == []):
+        if (participantesList == []):
             participantesList.append(asignacion.participante)
         else:
-            for participante in participantesList: 
-                if(participante.id == asignacion.participante.id):
+            for participante in participantesList:
+                if (participante.id == asignacion.participante.id):
                     cont = cont + 1
-            if(cont == 0):
+            if (cont == 0):
                 participantesList.append(asignacion.participante)
-    
+    # print("participantesList", participantesList)
     participantesListEjercitarioEvaluador = []
     try:
-        for participante in participantesList:        
-            participante_serializer  = ParticipanteSerializerObjectsNOPassword(participante)
+        for participante in participantesList:
+            participante_serializer = ParticipanteSerializer(participante)
             participantesListEjercitarioEvaluador.append(participante_serializer.data)
-            
+
         return JsonResponse({"participantes": participantesListEjercitarioEvaluador}, status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST) 
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+'''
+
+
+# metodo ligado con getEstudiantesEjercitarioResponsable
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getNotasEstudianteEjercitarioResponsable(request,correoEvaluador, ejercitario, correoParticipante):
-    
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getNotasEstudianteEjercitarioResponsable(request, ejercitario, idParticipante):
     try:
-        evaluadorEjer = Evaluador.objects.get(email=correoEvaluador) 
-        participante = Participante.objects.get(email=correoParticipante) 
-        ejercitarioAct = Ejercitario.objects.get(numeroDeEjercitario=ejercitario)
-        actividadParticipante = Actividad.objects.all().filter(ActividadPorEjercitario = ejercitarioAct).filter(ActividadDeParticipante = participante)
+        evaluadorEjer = request.user.id
+        print(ejercitario)
+        print(idParticipante)
+        participante = Participante.objects.get(pk=idParticipante)
+        ejercitarioAct = Ejercitario.objects.get(pk=ejercitario)
+
+        actividadParticipante = Actividad.objects.filter(ActividadPorEjercitario=ejercitarioAct,
+                                                         ActividadDeParticipante=participante,
+                                                         ejercitario__AsignacionEjercitario__evaluador__usuario_id=evaluadorEjer)
+
         listadoCalificaciones = []
         contCalificaciones = 0
-        contCalificacionesTiempo  = 0
+        contCalificacionesTiempo = 0
         contnumeroActi = 0
         for actiPart in actividadParticipante:
-            contCalificaciones = contCalificaciones+actiPart.calificacionActividad 
-            contCalificacionesTiempo = contCalificacionesTiempo+actiPart.tiempoTotalResolucionEjercitario
+            contCalificaciones = contCalificaciones + actiPart.calificacionActividad
+            contCalificacionesTiempo = contCalificacionesTiempo + \
+                                       actiPart.tiempoTotalResolucionEjercitario
             contnumeroActi = contnumeroActi + 1
 
         if (contnumeroActi > 0):
             diccionarioConParticipantesDict = {
-                'participante' : participante.id,
-                'ejercitario' : ejercitarioAct.idEjercitario,
-                'calificacion':  round((contCalificaciones/contnumeroActi),2),
-                'tiempo':  round((contCalificacionesTiempo/contnumeroActi),2)
+                'participante': participante.id,
+                'ejercitario': ejercitarioAct.idEjercitario,
+                'calificacion': round((contCalificaciones / contnumeroActi), 2),
+                'tiempo': round((contCalificacionesTiempo / contnumeroActi), 2)
             }
             listadoCalificaciones.append(diccionarioConParticipantesDict)
         else:
             diccionarioConParticipantesDict = {
-                'participante' : participante.id,
-                'ejercitario' : ejercitarioAct.idEjercitario,
-                'calificacion':  0,
-                'tiempo':  0
+                'participante': participante.id,
+                'ejercitario': ejercitarioAct.idEjercitario,
+                'calificacion': 0,
+                'tiempo': 0
             }
             listadoCalificaciones.append(diccionarioConParticipantesDict)
-            
-        return JsonResponse({"notas": listadoCalificaciones}, status=status.HTTP_201_CREATED)
-    except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    
 
+        return JsonResponse({"notas": listadoCalificaciones}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return JsonResponse({"notas": []}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def obtenerInformacionLandingPage(request):
-    
     try:
         evaluadoresCount = Evaluador.objects.all().count()
-        participanteCount = Participante.objects.all().filter(estado = 'activo').count()
+        participanteCount = Participante.objects.all().filter(estado='activo').count()
         simuladoresCount = Ejercitario.objects.all().count()
-        
+
         diccionarioLandingPageDict = {
-            'evaluadoresCount' : evaluadoresCount,
-            'participanteCount' : participanteCount,
-            'simuladoresCount':  simuladoresCount
-        }   
+            'evaluadoresCount': evaluadoresCount,
+            'participanteCount': participanteCount,
+            'simuladoresCount': simuladoresCount
+        }
         return Response(diccionarioLandingPageDict, status=status.HTTP_201_CREATED)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ParticipantesEjercitario(ListAPIView):
+    serializer_class = UsuarioCalificacionGlobalSerializer
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        ejercitarios = Ejercitario.objects.filter(
+            competencia_id=self.kwargs['pk'])
+        users = Usuario.objects.filter(
+            usuario_participante__evaluador__usuario_id=user.id)
+        users = users.filter(
+            usuario_participante__actividad_participante__ejercitario_id__in=ejercitarios)
+        data = []
+        for user in users:
+            if user not in data:
+                data.append(user)
+
+        return data
+
+
+class ParticipantesPendientesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="pendiente")
+
+
+class ParticipantesRechazadosListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Participante.objects.filter(evaluador__usuario_id=user.id, aceptacionResponsable="rechazado")
+
+
+class ParticipantesListApiView(ListAPIView):
+    serializer_class = ParticipanteSerializerList
+    permission_classes = (IsExpert,)
+
+    def get_queryset(self):
+        user = self.request.user
+        data = Participante.objects.filter(
+            evaluador__usuario_id=user.id, aceptacionResponsable="aprobado")
+        print("users", data)
+
+        return data
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def informacionCount(request):
+    try:
+        usuarios = Participante.objects.all().count()
+        ejercitarios = Ejercitario.objects.all().count()
+        competencias = Competencia.objects.all().count()
+        expertos = Evaluador.objects.all().count()
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        "usuarios": usuarios,
+        "ejercitarios": ejercitarios,
+        "expertos": expertos,
+        "competencias": competencias
+    }, status=status.HTTP_200_OK)

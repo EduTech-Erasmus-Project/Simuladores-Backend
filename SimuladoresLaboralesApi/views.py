@@ -22,9 +22,11 @@ class ExperienciaLaboralViewSet(viewsets.ModelViewSet):
   queryset = ExperienciaLaboral.objects.all()
   serializer_class = ExperienciaLaboralSerializer
 
+''' 
 class SesionViewSet(viewsets.ModelViewSet):
   queryset = Asignacion.objects.all()
   serializer_class = SesionSerializer
+'''
 
 class EjercitarioViewSet(viewsets.ModelViewSet):
   queryset = Ejercitario.objects.all()
@@ -34,6 +36,7 @@ class ActividadViewSet(viewsets.ModelViewSet):
   queryset = Actividad.objects.all()
   serializer_class = ActividadSerializer
 
+''' 
 class PreguntaViewSet(viewsets.ModelViewSet):
   queryset = Pregunta.objects.all()
   serializer_class = PreguntaSerializer
@@ -45,7 +48,7 @@ class DiscapaciadViewSet(viewsets.ModelViewSet):
 class GradoDiscapaciadViewSet(viewsets.ModelViewSet):
   queryset = DiscapacidadParticipante.objects.all()
   serializer_class = PreguntaSerializer
-  
+'''
 class ComentarioViewSet(viewsets.ModelViewSet):
   queryset = Comentario.objects.all()
   serializer_class = ComentarioSerializerObjectsModel

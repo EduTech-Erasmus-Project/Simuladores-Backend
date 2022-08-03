@@ -1,18 +1,32 @@
-import email
+import datetime
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
-from ..models import * 
-from ..serializers import * 
+from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView
+from django.template.loader import get_template
+
+from .emailsend import send_email
+from ..mixins import IsExpert
+from ..serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-import hashlib
+import environ
+import pdfkit
+
+
+env = environ.Env()
+
+
+
 
 
 @api_view(['GET'])
-@permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getParticipante(request,correo):
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getParticipante(request, pk):
+    '''
     try:
         participante = Participante.objects.get(email= correo)
     except:
@@ -20,66 +34,71 @@ def getParticipante(request,correo):
     
     participante_serializer = ParticipanteSerializerObjectsNOPassword(participante)
     return Response(participante_serializer.data)
+    '''
+    participante = get_object_or_404(Participante, pk=pk)
+    serializer = ParticipanteSerializerDiscapacidad(participante)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
+''' 
 def passwordEncriptacion(password):
-    encoded=password.encode()
+    encoded = password.encode()
     encryptPW = hashlib.sha256(encoded)
     return encryptPW.hexdigest()
+'''
 
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getParticipanteDeUnResponsable(request,correo,correoResponsable):
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getParticipanteDeUnResponsable(request, correo, correoResponsable):
     try:
-        evaluador = Evaluador.objects.get(email = correoResponsable)
-        participante = Participante.objects.all().filter(email= correo).filter(responsable = evaluador)
+        evaluador = Evaluador.objects.get(email=correoResponsable)
+        participante = Participante.objects.all().filter(email=correo).filter(responsable=evaluador)
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     participante_serializer = ParticipanteSerializerObjectsNOPassword(participante[0])
     if participante_serializer.is_valid:
         return Response(participante_serializer.data)
-    return Response(participante_serializer.errors) 
-
+    return Response(participante_serializer.errors)
+'''
+'''
 def passwordEncriptacion(password):
-    encoded=password.encode()
+    encoded = password.encode()
     encryptPW = hashlib.sha256(encoded)
     return encryptPW.hexdigest()
-
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def eliminarCuentaParticipante(request):
     email = request.data.get('correo')
     password = request.data.get('password')
     passwd = passwordEncriptacion(password)
     try:
-        participante = Participante.objects.get(email= email, password = passwd)
+        participante = Participante.objects.get(email=email, password=passwd)
     except:
-        return Response({'delete': 'notPossible'}, status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response({'delete': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
+
     participante.estado = 'eliminado'
-    try: 
+    try:
         participante.save()
-        return Response({'delete': 'ok'},status=status.HTTP_200_OK) 
-    except: 
-        return Response({'delete': 'error'},status=status.HTTP_400_BAD_REQUEST) 
-    
-
-
-
-
+        return Response({'delete': 'ok'}, status=status.HTTP_200_OK)
+    except:
+        return Response({'delete': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+'''
+'''
 @api_view(['PUT'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
 def editarCuentaParticipante(request):
-    
     email = request.data.get('correo')
     try:
-        participante = Participante.objects.get(email= email)
+        participante = Participante.objects.get(email=email)
     except:
-        return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response({'edit': 'notPossible'}, status=status.HTTP_404_NOT_FOUND)
+
     participanteModificado = request.data.get('participante')
     participante.nombre = participanteModificado['nombre']
     participante.apellido = participanteModificado['apellido']
@@ -91,77 +110,80 @@ def editarCuentaParticipante(request):
     participante.estudiosPrevios = participanteModificado['estudiosPrevios']
     participante.codigoEstudiante = participanteModificado['codigoEstudiante']
     participante.estadoCivil = participanteModificado['estadoCivil']
-    
+
     try:
         participante.save()
-        return Response({'edit': 'ok'},status=status.HTTP_200_OK) 
+        return Response({'edit': 'ok'}, status=status.HTTP_200_OK)
     except:
-        return Response({'edit': 'error'},status=status.HTTP_400_BAD_REQUEST) 
+        return Response({'edit': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+'''
+'''
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def informacionActividadesParticipante(request,correo):
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def informacionActividadesParticipante(request, correo):
     try:
-        participante = Participante.objects.get(email= correo)
-        actividades = Actividad.objects.all().filter(ActividadDeParticipante = participante).order_by('-fechaDeActividad')
+        participante = Participante.objects.get(email=correo)
+        actividades = Actividad.objects.all().filter(ActividadDeParticipante=participante).order_by('-fechaDeActividad')
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     listadoInformacionActividades = []
     try:
-        for actividad in actividades: 
-            ejercitario = Ejercitario.objects.get(idEjercitario = actividad.ActividadPorEjercitario.idEjercitario)
-        
+        for actividad in actividades:
+            ejercitario = Ejercitario.objects.get(idEjercitario=actividad.ActividadPorEjercitario.idEjercitario)
+
             informacionActividad = {
-                'idActividad' : actividad.idActividad,
+                'idActividad': actividad.idActividad,
                 'tiempoTotalResolucionEjercitario': actividad.tiempoTotalResolucionEjercitario,
                 'fechaDeActividad': actividad.fechaDeActividad,
                 'totalRespuestasCorrectasIngresadasParticipante': actividad.totalRespuestasCorrectasIngresadasParticipante,
-                'numeroTotalDePreguntasDelEjercitario':actividad.numeroTotalDePreguntasDelEjercitario,
+                'numeroTotalDePreguntasDelEjercitario': actividad.numeroTotalDePreguntasDelEjercitario,
                 'calificacionActividad': actividad.calificacionActividad,
                 'ejercitario': ejercitario.nombreDeEjercitario
             }
             listadoInformacionActividades.append(informacionActividad)
-        
-        return JsonResponse({"actividades":listadoInformacionActividades}, status=status.HTTP_200_OK)
-    except:
-        return Response({'actividades': 'error'},status=status.HTTP_400_BAD_REQUEST)
 
+        return JsonResponse({"actividades": listadoInformacionActividades}, status=status.HTTP_200_OK)
+    except:
+        return Response({'actividades': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+'''
 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def getParticipantesIntentosEjercitario(request,correo,ejercitario):
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getParticipantesIntentosEjercitario(request, correo, ejercitario):
     try:
-        participante = Participante.objects.get(email= correo)
-        ejercitario = Ejercitario.objects.get(numeroDeEjercitario = ejercitario)
-        actividades = Actividad.objects.all().filter(ActividadDeParticipante = participante).filter(ActividadPorEjercitario = ejercitario).order_by('-fechaDeActividad').values()
+        participante = Participante.objects.get(email=correo)
+        ejercitario = Ejercitario.objects.get(numeroDeEjercitario=ejercitario)
+        actividades = Actividad.objects.all().filter(ActividadDeParticipante=participante).filter(
+            ActividadPorEjercitario=ejercitario).order_by('-fechaDeActividad').values()
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
-    return JsonResponse({"actividades":list(actividades)}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    return JsonResponse({"actividades": list(actividades)}, status=status.HTTP_200_OK)
 
+''' 
 @api_view(['GET'])
 @permission_classes((permissions.AllowAny,))
-#@permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
-def obtenerInformacionAsignacionesParticipante(request,correo,correoResponsable):
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def obtenerInformacionAsignacionesParticipante(request, correo, correoResponsable):
     try:
         evaluadorBuscado = Evaluador.objects.get(email=correoResponsable)
-        participanteBuscado = Participante.objects.get(email= correo)
-        asignaciones = Asignacion.objects.all().filter(participante= participanteBuscado).filter(evaluador= evaluadorBuscado).order_by('-fechaAsignacion')
+        participanteBuscado = Participante.objects.get(email=correo)
+        asignaciones = Asignacion.objects.all().filter(participante=participanteBuscado).filter(
+            evaluador=evaluadorBuscado).order_by('-fechaAsignacion')
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND) 
-    
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     listadoInformacionAsignaciones = []
-    
+
     try:
-        for asignacion in asignaciones: 
-            ejercitario = Ejercitario.objects.get(idEjercitario= asignacion.ejercitario.idEjercitario)
+        for asignacion in asignaciones:
+            ejercitario = Ejercitario.objects.get(idEjercitario=asignacion.ejercitario.idEjercitario)
             informacionAsignacion = {
-                'idAsignacion' : asignacion.idAsignacion,
+                'idAsignacion': asignacion.idAsignacion,
                 'fechaAsignacion': asignacion.fechaAsignacion,
                 'participante': participanteBuscado.email,
                 'evaluador': evaluadorBuscado.email,
@@ -169,7 +191,190 @@ def obtenerInformacionAsignacionesParticipante(request,correo,correoResponsable)
                 'nombreDeEjercitario': ejercitario.nombreDeEjercitario
             }
             listadoInformacionAsignaciones.append(informacionAsignacion)
-        
-        return JsonResponse({"asignaciones":listadoInformacionAsignaciones}, status=status.HTTP_200_OK)
+
+        return JsonResponse({"asignaciones": listadoInformacionAsignaciones}, status=status.HTTP_200_OK)
     except:
-        return Response({'asignaciones': 'error'},status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'asignaciones': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+
+'''
+
+@api_view(['GET'])
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def getReporte(request, idCompetencia, idParticipante):
+    try:
+        competencia = Competencia.objects.get(id=idCompetencia)
+        usuario = Usuario.objects.get(usuario_participante=idParticipante)
+        usuario_serialize = UsuarioSerializer(usuario)
+
+        nivel1 = Actividad.objects.filter(participante_id=idParticipante, ejercitario__competencia_id=idCompetencia,
+                                          ejercitario__nivel="Nivel1").order_by("-id")
+        nivel2 = Actividad.objects.filter(participante_id=idParticipante, ejercitario__competencia_id=idCompetencia,
+                                          ejercitario__nivel="Nivel2").order_by("-id")
+        nivel3 = Actividad.objects.filter(participante_id=idParticipante, ejercitario__competencia_id=idCompetencia,
+                                          ejercitario__nivel="Nivel3").order_by("-id")
+
+        ''' 
+        if len(nivel1) == 0 or len(nivel2) == 0 or len(nivel3) == 0:
+            return Response({"status": "error", "code": "incomplete_grade"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if nivel1[0].calificacion != 100 or nivel2[0].calificacion != 100 or nivel3[0].calificacion != 100:
+            return Response({"status": "error", "code": "incomplete_grade"}, status=status.HTTP_400_BAD_REQUEST)
+        '''
+
+        data = {
+            "usuario": usuario_serialize.data,
+            "competencia": {
+                "id": competencia.id,
+                "titulo": competencia.titulo,
+                "niveles": [
+                    {
+                        "label": "Nivel 1",
+                        "value": "Nivel1",
+                        "estado": "Aprobado" if len(nivel1) > 0 and nivel1[0].calificacion == 100 else "Cursando",
+                        "fecha": nivel1[0].fecha if len(nivel1) > 0 else None,
+                        "calificacion": nivel1[0].calificacion if len(nivel1) > 0 else 0,
+                        "intentos": len(nivel1),
+                        "actividades": nivel1.values(),
+                    },
+                    {
+                        "label": "Nivel 2",
+                        "value": "Nivel2",
+                        "estado": "Aprobado" if len(nivel2) > 0 and nivel2[0].calificacion == 100 else "Cursando",
+                        "fecha": nivel2[0].fecha if len(nivel2) > 0 else None,
+                        "calificacion": nivel2[0].calificacion if len(nivel2) > 0 else 0,
+                        "intentos": len(nivel2),
+                        "actividades": nivel2.values(),
+                    },
+                    {
+                        "label": "Nivel 3",
+                        "value": "Nivel3",
+                        "estado": "Aprobado" if len(nivel3) > 0 and nivel3[0].calificacion == 100 else "Cursando",
+                        "fecha": nivel3[0].fecha if len(nivel3) > 0 else None,
+                        "calificacion": nivel3[0].calificacion if len(nivel3) > 0 else 0,
+                        "intentos": len(nivel3),
+                        "actividades": nivel3.values(),
+                    }
+                ]
+            }
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        #print(e)
+        return Response({"status": "error", "code": "not_found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+# @permission_classes((permissions.AllowAny,))
+# @permission_classes((permissions.IsAuthenticated, permissions.BasePermission))
+def download_certificado(request, idCompetencia, idParticipante):
+    try:
+        pass
+    except Exception as e:
+        pass
+
+
+@api_view(['GET'])
+@permission_classes((IsExpert,))
+def descargar_certificado(request, idCompetencia, idParticipante):
+    #print(idCompetencia)
+    try:
+        cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
+        serializer = CertificadoSerializer(cert)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+
+        cert = geanarar_certificado(idCompetencia, idParticipante, request)
+        if cert == None:
+            return Response({"code": "error", "message": "error to generate cert"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer = CertificadoSerializer(cert)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes((IsExpert,))
+def enviar_certificado(request, idCompetencia, idParticipante):
+    #print(idCompetencia)
+    cert = None
+    try:
+        cert = Certificado.objects.get(participante_id=idParticipante, competencia_id=idCompetencia)
+        res = send_email(cert)
+        if res:
+            return Response({"code": "ok", "message": "certificado enviado"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"code": "error", "message": res.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        if cert is None:
+            cert = geanarar_certificado(idCompetencia, idParticipante, request)
+            if cert is None:
+                return Response({"code": "error", "message": "error to generate cert"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                res = send_email(cert)
+                if res:
+                    return Response({"code": "ok", "message": "certificado enviado"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"code": "error", "message": res.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"code": "error", "message": e.__str__()}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def geanarar_certificado(idCompetencia, idParticipante, request):
+    competencia = Competencia.objects.get(id=idCompetencia)
+    usuario = Usuario.objects.get(usuario_participante=idParticipante)
+    evaluador = Usuario.objects.get(id=request.user.id)
+
+
+    template = get_template('cert/certificate.html')
+
+    # Add any context variables you need to be dynamically rendered in the HTML
+    context = {}
+
+    context["usuario"] = usuario
+    context["competencia"] = competencia
+    context["evaluador"] = evaluador
+    context["date"] = datetime.datetime.now()
+    # Render the HTML
+    html = template.render(context)
+
+    #print(html)
+
+    options = {
+        'encoding': 'UTF-8',
+        # 'javascript-delay': '1000',  # Optional
+        'enable-local-file-access': None,  # To be able to access CSS
+        'page-size': 'A4',
+        'custom-header': [
+            ('Accept-Encoding', 'gzip')
+        ],
+    }
+
+    #print("path", env('wkhtmltopdf'))
+
+    file_content = None
+
+    try:
+        # Remember that location to wkhtmltopdf
+        config = pdfkit.configuration(wkhtmltopdf=env('wkhtmltopdf'))
+        file_content = pdfkit.from_string(html, False, configuration=config, options=options)
+
+        #print("render ok")
+        certificado = Certificado(
+            competencia=competencia,
+            participante_id=idParticipante,
+            certificado=ContentFile(file_content, name=str(shortuuid.ShortUUID().random(length=24))+".pdf")
+        )
+        certificado.save()
+        return certificado
+
+    except Exception as e:
+        print(e)
+        #print(file_content)
+        return None
+
+
+
+class CertificateView(TemplateView):
+    template_name = 'cert/certificate.html'

@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Certificado</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .images {
+            text-align: center;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-top: 3em;
+            font-family: "Aharoni", arial, serif, sans-serif;
+        }
+
+        .title p {
+            font-size: 1em;
+            font-family: arial;
+        }
+
+        .name {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 0.5em;
+            font-family: arial, serif, sans-serif;
+            color: #0070c0;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 1.7em;
+            margin-top: 0.5em;
+            font-family: arial, serif, sans-serif;
+        }
+    </style>
+</head>
+
+<!--
+<link href="//db.onlinewebfonts.com/c/3c1a440c0da3e6484b92282953ca3555?family=Aharoni" rel="stylesheet"
+        type="text/css" />
+.content {
+            width: 100%;
+            height: 100vh;
+            max-height: 100vh;
+            background-image: url("https://simulab.edutech-project.org/static/img/edutechbg.svg");
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            opacity: 0.1;
+        }
+
+ -->
+
+<body>
+    <div class="content">
+        <div class="images">
+            <table style="width: 100%; ">
+                <tr>
+                    <td width="33.3%">
+                        <img height="100" style="" src="https://simulab.edutech-project.org/static/img/UDA.png" alt="UDA" />
+                    </td>
+                    <td width="33.3%">
+                        <div>
+                            <img height="125" src="https://simulab.edutech-project.org/static/img/edutech.svg" alt="EduTech" />
+                        </div>
+                        <div>
+                            <img height="50" src="https://simulab.edutech-project.org/static/img/cofinanciado_derecha.png" alt="Erasmus+" />
+                        </div>
+                    </td>
+                    <td width="33.3%">
+                        <img height="100" src="https://simulab.edutech-project.org/static/img/unitwin_ec_salesiana_sp.png" alt="Catedra" />
+                    </td>
+                </tr>
+            </table>
+
+
+        </div>
+        <div class="title">
+            <h1 style="text-transform: uppercase">CERTIFICADO</h1>
+            <p style="font-weight: normal">A</p>
+        </div>
+        <div class="name">
+            <h2>{{usuario.nombre}} {{usuario.apellido}}</h2>
+        </div>
+        <div class="description">
+            <p>
+                Por haber completado con éxito la competencia de
+                <strong>Comunicación Efectiva</strong>, en la plataforma de
+                Simuladores Laborales, desarrollado por el proyecto de investigación
+                internacional EduTech “Asistencia tecnológica a la accesibilidad en la
+                Educación Superior Virtual”, cofinanciado por el programa Erasmus+ de
+                la Unión Europea.
+            </p>
+            <p style="margin-top: 2em;">Otorgado el {{ date|date:"d" }} de {{ date|date:"F" }} de {{ date|date:"Y" }}</p>
+        </div>
+        <table class="signatures" style="width: 100%; margin-top: 15em">
+            <tr>
+                <td style="text-align:center; font-size:1.3em">
+
+                    <h3>Psic. Monica Rodas</h3>
+                    <p>Coordinadora proyecto EduTech</p>
+                    <p>Univesidad del Azuay</p>
+                </td>
+                <td style="text-align:center; font-size:1.3em">
+                    <h3>{{evaluador.nombre}} {{evaluador.apellido}}</h3>
+                    <p>Docente Evaluador</p>
+                    <p>{{evaluador.institucion}}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

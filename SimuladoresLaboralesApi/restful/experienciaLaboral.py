@@ -17,6 +17,8 @@ def getExperienciaLaboral(request,correo):
         return Response(status=status.HTTP_404_NOT_FOUND) 
     return JsonResponse({"experienciaLaboral":list(experienciasPartipante)}, status=status.HTTP_200_OK)
 
+
+#varificar metodo
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def registrarExperienciaLaboral(request): 
